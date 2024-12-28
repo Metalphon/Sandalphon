@@ -1,0 +1,47 @@
+iic_part iic_part
+(
+	.clk(clk),
+	.clk_400k(clk_400k),
+	.reset(rst_n),
+	.trans_en(trans_en),
+	.scl(scl),
+	.sda(sda)
+);
+wire 			trans_en;
+####################################################################################
+module iic_part
+(
+	input clk_400k,//I2C时钟
+	input reset,
+	output trans_en,
+	output scl,
+	inout sda,
+	) ;
+
+iic iic(
+	.clk(clk_400k),
+	.rst_n(reset),	//系统复位，低有效
+	.trans_en(trans_en),
+	.i2c_scl(scl),	//I2C总线SCL
+	.i2c_sda(sda),	//I2C总线SDA
+	.T_code(T_code),	//温度码值
+	.H_code(H_code)	//湿度码值
+	);
+
+// 温度 T = -45 + 175 * T_code / (2^16-1) = (-45 + 175 * T_code / 2^16) 
+wire [31:0] a = T_code * 16'd17500;
+wire [31:0] b = a >> 16; //除以2^16取商
+wire [31:0] c = (b>=32'd4500)? (b - 32'd4500):(32'd4500 - b); //温度有正负，取绝对值
+wire [15:0] T_data_bin = c[15:0];
+assign t_data = T_data_bin;//温度数据
+
+// 湿度 TH = 100 * H_code / 2^16 = (100 * H_code / 2^16) 
+wire [31:0] d = H_code * 16'd1000;
+wire [31:0] e = d >> 16; //除以2^16取商
+wire [15:0] H_data_bin = e[15:0];
+assign h_data = H_data_bin;//湿度数据
+
+wire 	  trans_en;
+
+
+endmodule
