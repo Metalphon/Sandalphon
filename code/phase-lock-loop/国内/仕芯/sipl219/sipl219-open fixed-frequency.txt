@@ -1,0 +1,238 @@
+module sipl219_open_spi(
+    input           clk,
+    input           reset,
+    input           cfg_reg_en,
+    input     [23:0]reg03,
+    output reg      cfg_reg_finish,
+    output reg      sclk,
+    output reg      sdi,
+    output reg      le
+    );
+
+
+wire[31:0]data_rom[9:0];
+assign data_rom[0] = 32'h00001F00;     //reg 00
+assign data_rom[1] = 32'h00000004;     //reg 01
+assign data_rom[2] = 32'h01000108;     //reg 02 R_div 1
+assign data_rom[3] = 32'h0002430C;     //reg 03 N_div 579
+assign data_rom[4] = 32'h00000010;     //reg 04 F_div 0
+assign data_rom[5] = 32'h001E6118;     //reg 06 int_mode
+assign data_rom[6] = 32'h00000020;     //reg 09
+assign data_rom[7] = 32'h00000024;     //reg 09 ld
+assign data_rom[8] = 32'hFFFF0528;     //reg 0A current
+assign data_rom[9] = 32'h0000002C;     //reg 0B current
+
+//r_div=freq*r_div/100mhz
+//freq1 = 6.5ghz rdiv = 24'h41
+//freq2 = 9.5ghz rdiv = 24'h5f
+//freq3 = 11.5ghz rdiv = 24'h73
+//rom3 = 24bit data+6'b000011+2'b00;
+
+reg[2:0]STATE;
+reg[2:0]NEXTSTATE;
+reg[3:0]cnt_reg;
+reg[7:0]cnt_wait;
+reg[31:0]data_reg;
+
+
+
+
+reg[2:0] STATE_CFG;
+reg[31:0]data;
+reg[4:0] data_cnt;
+
+always @(posedge clk)
+    begin
+        if(reset == 1'b1)
+            begin
+                cfg_reg_finish <= 1'b1;
+                sclk           <= 1'b0;
+                sdi            <= 1'b0;
+                le             <= 1'b0;
+                STATE          <= 3'b000;
+                NEXTSTATE      <= 3'b000;
+                cnt_reg        <= 4'h0;
+                cnt_wait       <= 8'h00;
+                STATE_CFG      <= 3'b000;
+                data           <= 32'h0000_0003;
+                data_cnt       <= 5'd0;                
+//				data_reg[0]    <= 32'h2000190C;     //reg 03 N_div 25                
+//				data_reg[1]    <= 32'hA0A00028;     //reg 0A current
+//				data_reg[2]    <= 32'hC3333310;     //reg 04 F_div 12792627				
+//				data_reg[3]    <= 32'h0000190C;     //reg 03
+				data_reg       <= 32'h000243F3;
+            end
+        else
+            begin
+                case(STATE)
+                    3'b000:
+                        begin
+                            if(cnt_wait == 8'hFF)
+								begin
+									cnt_wait       <= 8'd0;
+									STATE          <= 3'b001;
+									NEXTSTATE      <= 3'b001;	
+                                    cnt_reg        <= 4'h0;                                    
+									cfg_reg_finish <= 1'b0;
+								end
+							else
+								begin
+									cnt_wait       <= cnt_wait + 8'd1;
+								end
+                        end
+                    3'b001:
+                        begin
+                            Transmit_32(data_rom[cnt_reg]);
+							NEXTSTATE <= 3'b010;
+                        end
+                    3'b010:
+                        begin
+                            if(cnt_reg == 4'd9)
+								begin
+									cnt_reg   <= 4'd0;
+									STATE     <= 3'b011;
+									NEXTSTATE <= 2'b011;
+								end
+							else
+								begin
+									cnt_reg   <= cnt_reg + 4'd1;
+									STATE     <= 3'b001;
+									NEXTSTATE <= 3'b001;
+								end
+                        end
+                    3'b011:
+                        begin
+                            cfg_reg_finish <= 1'b1;	
+							STATE          <= 3'b100;
+							NEXTSTATE      <= 3'b100;
+                        end
+                    3'b100:
+                        begin
+                            if(cfg_reg_en == 1'b1)						
+								begin																		
+//									data_reg[3]    <= {reg03,6'b000011,2'b00};            //reg 03 N_div 25
+//									data_reg[2]    <= {reg04,6'b000100,2'b00};            //reg 04 F_div 12792627									
+//									data_reg[1]    <= {reg0A,6'b001010,2'b00};            //reg 0A 										
+//									data_reg[0]    <= {4'h2,reg03[19:0],6'b000011,2'b00}; //reg 03 N_div 25	
+									data_reg       <= {reg03,6'b000011,2'b00};
+									cfg_reg_finish <= 1'b0;											
+									cnt_reg        <= 4'h0;								
+									STATE          <= 3'b101;
+									NEXTSTATE      <= 3'b101;	
+								end						
+							else									
+								begin							
+									STATE          <= 3'b100;
+									NEXTSTATE      <= 3'b100;							
+								end	
+                        end
+                    3'b101:
+                        begin                    
+//							Transmit_32(data_reg[cnt_reg]);
+//							NEXTSTATE <= 3'b110;
+                            Transmit_32(data_reg);
+							NEXTSTATE <= 3'b110;
+                        end
+                    3'b110:
+                        begin                    
+//							if(cnt_reg == 4'd3)
+//								begin
+//									cnt_reg   <= 4'd0;
+//									STATE     <= 3'b111;
+//									NEXTSTATE <= 3'b111;
+//								end
+//							else
+//								begin
+//									cnt_reg   <= cnt_reg + 4'd1;
+//									STATE     <= 3'b101;
+//									NEXTSTATE <= 3'b101;
+//								end
+							STATE     <= 3'b111;
+							NEXTSTATE <= 3'b111;
+                        end
+                    3'b111:
+                        begin
+                            STATE     <= 3'b011;
+							NEXTSTATE <= 3'b011;
+                        end
+                endcase
+            end
+    end
+
+task Transmit_32;
+input [31:0]Data_32;
+	begin
+		case(STATE_CFG)
+			3'b000:
+				begin
+					data      <= Data_32;
+					data_cnt  <= 5'd0;
+                    le        <= 1'b0;
+					STATE_CFG <= 3'b001;
+				end
+			3'b001:
+				begin
+					sclk      <= 1'b0;				
+					if(data_cnt == 5'd1)
+                        begin
+                            le <= 1'b1;
+                        end
+                    else if(data_cnt == 5'd30)
+                        begin
+                            le <= 1'b0;
+                        end
+                    else
+                        begin
+                            le <= le;
+                        end
+					STATE_CFG <= 3'b010;
+				end
+			3'b010:
+				begin			
+                    STATE_CFG <= 3'b011;
+                    sdi       <= data[31];	
+				end
+			3'b011:
+				begin
+					sclk      <= 1'b1;					
+					STATE_CFG <= 3'b100;		
+				end
+			3'b100:
+				begin
+					data <= {data[30:0],1'b0};
+					if(data_cnt == 5'd31)
+						begin
+							data_cnt  <= 5'd0;
+							STATE_CFG <= 3'b101;
+                            sclk      <= 1'b0;
+						end
+					else
+						begin
+							data_cnt  <= data_cnt + 5'd1;
+							STATE_CFG <= 3'b001;
+						end	
+				end
+			3'b101:
+				begin
+					le        <= 1'b1;
+					STATE_CFG <= 3'b110;
+				end					
+			3'b110:				
+				begin			
+					le        <= 1'b0;
+					STATE_CFG <= 3'b000;
+					STATE     <= NEXTSTATE;			
+				end									
+			default:				
+				begin				
+					STATE          <= 3'b000;
+                	NEXTSTATE      <= 3'b000;
+                	cnt_reg        <= 4'h0;
+               	 	cnt_wait       <= 8'h00;
+                	STATE_CFG      <= 3'b000;		
+				end
+		endcase
+	end
+endtask
+
+endmodule
