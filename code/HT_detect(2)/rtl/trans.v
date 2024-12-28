@@ -1,0 +1,185 @@
+module trans(
+	input 			 clk,
+	input 			 reset,
+	input 			 bps_en_tx,
+	input 			 [16:0]final,
+	input 			 [16:0]final_h,
+	input 			 trans_en,
+	output reg      tx_data_valid,
+	output reg [7:0]tx_data_in
+
+);
+reg		[7:0]		num;
+reg		[74*8-1:0]	char;
+reg		[39:0]cnt_gap;
+reg		[3:0]		cnt_main;
+reg		[2:0]		cnt_txmd;
+reg		[23:0]		cnt_delay;
+reg		[23:0]		num_delay;
+reg		[3:0] 		state = IDLE;
+localparam			IDLE	=	4'b0000,
+						MAIN	=	4'b0001,
+						TXMD	=	4'b0010,
+						REMD	=	4'b0100,
+						DELAY	=	4'b1000;
+
+						
+						
+parameter CMD1 = {"AT+MQTTUSERCFG=0,1,", 8'h22, "ESP8266", 8'h22, ",", 8'h22,8'h22, ",",8'h22,8'h22,",0,0,",8'h22,8'h22,16'h0d0a};
+parameter CMD2 = {"AT+MQTTCONN=0,", 8'h22, "shishengmi.com", 8'h22, ",","1883",",0", 16'h0d0a}; // MQTT服务器地址
+reg [600:0]CMD3;
+reg [23:0]T_code_str;
+reg [23:0]H_code_str;	
+always @(*) begin
+   //T_code_str <= {8'h30, 8'h30, 8'h30}; 
+	if (final > 16'd99) 
+		begin
+			T_code_str[23:16] <= (final / 100) + 8'h30;          // 百位
+			T_code_str[15:8]  <= ((final / 10) % 10) + 8'h30;    // 十位
+			T_code_str[7:0]   <= (final % 10) + 8'h30;           // 个位
+		end 
+	else if (final > 16'd9) 
+		begin
+    // 对应两位数的情况
+			T_code_str[23:16] <= 8'h30;                          // 补 0
+			T_code_str[15:8]  <= (final / 10) + 8'h30;           // 十位
+			T_code_str[7:0]   <= (final % 10) + 8'h30;           // 个位
+		end 
+	else 
+		begin
+    // 对应一位数的情况
+			T_code_str[23:16] <= 8'h30;                          // 补 0
+			T_code_str[15:8]  <= 8'h30;                          // 补 0
+			T_code_str[7:0]   <= final + 8'h30;                  // 个位
+		end
+	if (final_h > 16'd99) 
+    begin
+    // 对应三位数的情况
+        H_code_str[23:16] <= (final_h / 100) + 8'h30;          // 百位
+        H_code_str[15:8]  <= ((final_h / 10) % 10) + 8'h30;    // 十位
+        H_code_str[7:0]   <= (final_h % 10) + 8'h30;           // 个位
+    end 
+else if (final_h > 16'd9) 
+    begin
+    // 对应两位数的情况
+        H_code_str[23:16] <= 8'h30;                            // 补 0
+        H_code_str[15:8]  <= (final_h / 10) + 8'h30;           // 十位
+        H_code_str[7:0]   <= (final_h % 10) + 8'h30;           // 个位
+    end 
+else 
+    begin
+    // 对应一位数的情况
+        H_code_str[23:16] <= 8'h30;                            // 补 0
+        H_code_str[15:8]  <= 8'h30;                            // 补 0
+        H_code_str[7:0]   <= final_h + 8'h30;                  // 个位
+    end
+
+	CMD3 <= {"AT+MQTTPUB=0,",8'h22,"/sub",8'h22,",",8'h22,"{",16'h5c22,"t",16'h5c22,":",T_code_str,8'h5c,",",16'h5c22, "h", 16'h5c22,":",H_code_str,"}",8'h22,",0,0",16'h0d0a};
+    end						
+						
+always@(posedge clk or negedge reset) begin
+	if(!reset) begin
+		cnt_main <= 1'b0;
+		cnt_txmd <= 1'b0;
+		cnt_delay <= 1'b0;
+		num_delay <= 24'd8_000_000;
+		state <= IDLE;
+	end else begin
+		case(state)
+			IDLE:begin
+					cnt_main <= 1'b0;
+					cnt_txmd <= 1'b0;
+					cnt_delay <= 1'b0;
+					num_delay <= 24'd8_000_000;
+					state <= MAIN;
+				end
+			MAIN:begin
+					
+					case(cnt_main)
+					4'd0: begin 
+						num <= 8'd43; 
+						char <= CMD1;
+						state <= TXMD; 
+						cnt_main<= 4'd1;
+					end
+					4'd1: 
+						begin 
+							num <= 8'd39; 
+							char <= CMD2;
+							state <= TXMD;
+							cnt_main<= 4'd2;
+						end
+					4'd2:
+						begin
+							if(trans_en)
+								begin
+									cnt_main<= 4'd3;
+									//state <= TXMD;
+								end
+							else
+								begin
+									cnt_main<= cnt_main;
+								end
+						end
+					4'd3: begin 
+						num <= 8'd59; 
+						char <= CMD3;
+						state <= TXMD; 
+						cnt_main<= 4'd4;
+					end
+					4'd4:
+						begin
+							if(cnt_gap>=40'hb71b00)
+								begin
+									cnt_main<=4'd5;
+									cnt_gap<=40'h0;
+								end
+							else
+								begin
+									cnt_gap<=cnt_gap+1'h1;
+								end
+						end
+					4'd5:
+						begin
+							if(~trans_en)
+								begin
+									cnt_main<= 4'd2;
+								end
+							else
+								begin
+									cnt_main<= cnt_main;
+								end
+							
+						end
+						default: cnt_main <= 4'd6;
+					endcase
+				end
+			TXMD:begin
+					case(cnt_txmd)
+						3'd0:	if(bps_en_tx) cnt_txmd <= cnt_txmd; 
+								else cnt_txmd <= cnt_txmd + 1'b1;
+						3'd1:	begin num <= num - 1'b1; cnt_txmd <= cnt_txmd + 1'b1; end
+						3'd2:	begin tx_data_valid <= 1'b1; tx_data_in <= char[(num*8)+:8]; cnt_txmd <= cnt_txmd + 1'b1; end
+						3'd3:	begin 
+									tx_data_valid <= 1'b0; 
+									if(num>=1'b1) cnt_txmd <= 3'd0;
+									else cnt_txmd <= cnt_txmd + 1'b1;
+								end
+						3'd4:	begin state <= DELAY; cnt_txmd <= 1'b0; end
+						default: state <= IDLE;
+					endcase
+				end
+			REMD:begin 
+					state <= REMD; 
+				end
+			DELAY:begin	// 
+					if(cnt_delay >= num_delay) begin
+						cnt_delay <= 1'b0;
+						state <= MAIN; 
+					end else cnt_delay <= cnt_delay + 1'b1;
+				end
+			default: state <= IDLE;
+		endcase
+	end
+end	
+endmodule 

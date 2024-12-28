@@ -1,0 +1,96 @@
+module main
+(
+		input			wire		clk,
+		input			wire		reset,
+		//iic
+		inout			wire		sda,	//I2C数据总线
+		output		wire		scl,	//I2C时钟总线
+		//uart
+		input			wire		wifi_rx,			// esp8266_tx fpga_rx
+		output		wire		wifi_tx,			// fpga_tx esp8266_tx
+		output		wire		uart_tx,			// 串口调试
+		//seg
+		output		wire		rck,	
+		output		wire		sck,	
+		output		wire		din,
+		//lcd
+		output      wire		lcd_rst,
+		output		wire		lcd_blk,
+    	output      wire		lcd_dc,
+   	output      wire		lcd_sclk,
+    	output      wire		lcd_mosi,
+    	output      wire		lcd_cs      
+	);
+assign 		uart_tx = wifi_rx;	//将ESP8266返回的数据显示在串口调试助手上
+
+clk_gen clk_gen_inst
+(
+    .areset     (~reset),  //输入复位信号,高电平有效,1bit
+    .inclk0     (clk),  //输入12MHz晶振时钟,1bit
+    .c0         (clk_400k),  //输出i2c工作时钟,频率400Khz,1bit
+	 .c1         (clk_50m),	//输出tft工作时钟,频率50m,1bit
+
+    .locked     (locked)   //输出pll locked信号,1bit
+);
+wire 			clk_400k;//IIC时钟
+wire			clk_50m;//LCD时钟
+wire			rst_n;//pll生成系统复位信号
+assign		rst_n = (locked & reset);
+
+picture_display picture_display_inst
+(
+	.clk(clk),
+	.rst_n(rst_n), 
+	.clk_50m(clk_50m),
+	.lcd_rst(lcd_rst),
+	.lcd_blk(lcd_blk),
+	.lcd_dc(lcd_dc),
+	.lcd_sclk(lcd_sclk),
+	.lcd_mosi(lcd_mosi),
+	.lcd_cs(lcd_cs)
+);
+
+iic_part iic_part
+(
+	.clk(clk),
+	.clk_400k(clk_400k),
+	.reset(rst_n),
+	.trans_en(trans_en),
+	.scl(scl),
+	.sda(sda),
+	.rck(rck),
+	.sck(sck),
+	.din(din),
+	.temp1(temp1),
+	.final_h(final_h)
+);
+wire 			trans_en;
+wire [15:0] temp1;
+wire [15:0]	final = temp1/10;
+wire [15:0]	final_h;
+
+trans trans
+(
+	.clk(clk),
+	.reset(rst_n),
+	.bps_en_tx(bps_en_tx),
+	.final(final),
+	.final_h(final_h),
+	.trans_en(trans_en),
+	.tx_data_valid(tx_data_valid),
+	.tx_data_in(tx_data_in)
+);
+wire 			tx_data_valid;
+wire [7:0]	tx_data_in;
+wire			bps_en_tx;	
+uart_part uart_part
+(
+	.clk(clk),
+	.reset(rst_n),
+	.tx_data_in(tx_data_in),
+	.tx_data_valid(tx_data_valid),
+	.bps_en_tx(bps_en_tx),
+	.wifi_tx(wifi_tx)
+);
+
+endmodule

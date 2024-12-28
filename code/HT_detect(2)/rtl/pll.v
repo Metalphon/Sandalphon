@@ -1,0 +1,26 @@
+module pll(
+	input clk,
+	input rst_n,
+	output reg clk_400k
+);
+parameter	cnt_pll	=	15;
+reg		[9:0]		cnt_400k;
+//使用计数器分频产生400KHz时钟信号clk_400k
+always@(posedge clk or negedge rst_n) 
+	begin
+		if(!rst_n) 
+			begin
+				cnt_400k <= 10'd0;
+				clk_400k <= 1'b0;
+			end 
+		else if(cnt_400k >= cnt_pll-1) 
+			begin
+				cnt_400k <= 10'd0;
+				clk_400k <= ~clk_400k;
+			end 
+		else 
+			begin
+				cnt_400k <= cnt_400k + 1'b1;
+			end
+	end
+endmodule
