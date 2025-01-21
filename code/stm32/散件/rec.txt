@@ -1,0 +1,15 @@
+HAL_StatusTypeDef rec(UART_HandleTypeDef *huart, uint8_t *data, uint16_t length);
+
+HAL_StatusTypeDef rec(UART_HandleTypeDef *huart, uint8_t *data, uint16_t length) {
+    return HAL_UART_Receive(huart, data, length, HAL_MAX_DELAY);
+}
+###################在usart中填入上述代码
+uint16_t length = 10; 
+HAL_StatusTypeDef fuck;
+uint8_t buffer[BUFFER_MAX_LEN];
+
+fuck = rec(&huart1, buffer, length);
+for (uint16_t i = 0; i < length; i++) {
+printf("Data[%d]: %d\r\n", i, buffer[i]);
+}
+使用上述代码即可接收数据，fuck会是hal库的应答信号，ok，error，timeout之类的，需要对齐位数，若位数移除则会在下一次发送，待改进

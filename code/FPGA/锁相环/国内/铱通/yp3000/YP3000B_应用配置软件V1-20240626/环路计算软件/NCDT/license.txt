@@ -1,0 +1,19 @@
+Copyright (C) 1999 - 2012 National Semiconductor Corporation. All rights reserved.
+
+CONDITIONED UPON CLICK ACCEPTANCE BELOW, BY THIS LICENSE AGREEMENT NATIONAL SEMICONDUCTOR GRANTS YOUR ORGANIZATION A LIMITED LICENSE FREE OF CHARGE TO USE NATIONAL'S CLOCK DESIGN TOOL (OBJECT/BYTECODE FILES ONLY) SOLELY TO PROVIDE DESIGN ASSISTANCE IN CONNECTION WITH COMPONENTS SOLD BY NATIONAL.
+
+BY INDICATING ACCEPTANCE BELOW, YOU REPRESENT THAT YOU ARE AUTHORIZED TO BIND YOUR ORGANIZATION TO, AND YOUR ORGANIZATION WILL BE BOUND BY, ALL OF THE TERMS OF THIS LICENSE AGREEMENT.  
+
+DO NOT DOWNLOAD AND/OR INSTALL AND/OR USE THIS DESIGN TOOL UNLESS YOU CAN MAKE THESE REPRESENTATIONS.
+
+National retains ownership of this Design Tool, granting your organization a limited license to internally use the Design Tool solely to provide design assistance in connection with National Components.  The Design Tool shall not be modified or reverse engineered (such as by disassembly), and shall not be sublicensed or otherwise transferred or disclosed to any third party.
+
+This Design Tool is provided "AS IS" without warranty of any kind, including any warranty as to component selection, configuration, simulation or other results or design information obtained from using the Design Tool, and without any obligation to provide any technical or other support in connection with the Design Tool.  National expressly disclaims all warranties, expressed, implied or otherwise, including without limitation, warranties of merchantability, fitness for a particular purpose and non-infringement of intellectual property rights.  Any design or product implemented using this Design Tool should undergo full test, verification, and qualification, including verification of functionality, performance and reliability requirements, and including verification of the selection, configuration and performance of any National Components.
+
+National shall not be liable for any direct or indirect or punitive damages of any kind, including but not limited to any special, consequential or incidental damages, including any costs of labor, delay, requalification or replacement, and any lost business opportunity, profits, or goodwill, whether arising out of the use or inability to use this Design Tool, even if National is advised of the possibility of such damages.  This Design Tool is provided Free of Charge and As Is, and therefore, in no event shall National have any liability arising out of or in connection with the license or use of this Design Tool, under any theory of liability including but not limited to contract, tort or promissory fraud.  The foregoing limitations shall not apply to damages resulting directly from National's willful and wanton conduct.  To the maximum extent permitted under law, the limitations in this paragraph shall apply even if this limited remedy is found to have failed of its essential purpose.  
+
+The allocation of risks established by the preceding two paragraphs is an essential basis of National's agreement to license this Design Tool, and National would be unwilling to provide this Design Tool on any other basis.
+
+If any term of this Agreement becomes or is declared to be invalid or unenforceable in any respect, such condition shall not affect the validity or enforceability of any of the remaining terms which remain in full force and effect.
+
+This license is governed by the laws of Delaware, excluding its principles of conflict of laws, and excluding the United Nations Convention on Contracts for the Sale of Goods. 

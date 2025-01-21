@@ -1,0 +1,305 @@
+module yp6000acs_spi(
+    input      clk,
+    input      reset,
+    input 	   trans_en,
+    input	   ld,
+    input	   [35:0]data2,
+    input      trans_finish1,//前一环发送结束标志
+    output reg trans_finish2,//yp6000发送结束标志
+	output reg yp6000_clk,
+	output reg yp6000_enb,
+	output reg yp6000_di
+    );
+
+
+
+wire[15:0]data_rom[9:0];
+wire[15:0]bbbb_rom[45:0];
+reg [5:0]gap;
+reg	[39:0]ld_cnt;
+assign WAIT_CNT_MAX= 8'hF0;
+
+assign data_rom[0] = 16'h9C40;
+assign data_rom[1]  = {12'h800,data2[35:32]};//nint high
+assign data_rom[2]  = {8'h81,data2[31:24]};//nint low
+assign data_rom[3]  = {8'h82,data2[23:16]};//nfrac
+assign data_rom[4]  = {8'h83,data2[15:8]};//nfrac
+assign data_rom[5]  = {8'h84,data2[7:0]};//nfrac
+assign data_rom[6] = 16'h970a;
+assign data_rom[7] = 16'h9702;
+//assign data_rom[8] = 16'h8C00;
+assign data_rom[8] = 16'h8Cff;
+assign data_rom[9] = 16'h9C46;
+/*
+assign data_rom[5]  = 16'h8500;//seed
+assign data_rom[6]  = 16'h8600;//
+assign data_rom[7]  = 16'h8700;//rdiv en
+assign data_rom[8]  = 16'h8801;//rdiv low
+assign data_rom[9]  = 16'h8900;//vcobuf
+assign data_rom[10] = 16'h8A00;//vcoen
+assign data_rom[11] = 16'h8B00;//current
+assign data_rom[12] = 16'h8C00;//cp current
+assign data_rom[13] = 16'h8D00;//cp
+assign data_rom[14] = 16'h8E00;//cp
+assign data_rom[15] = 16'h8F00;//cp
+assign data_rom[16] = 16'h9000;//current
+assign data_rom[17] = 16'h9100;//
+assign data_rom[18] = 16'h9200;
+assign data_rom[19] = 16'h9300;
+assign data_rom[20] = 16'h9400;
+assign data_rom[21] = 16'h9500;
+assign data_rom[22] = 16'h9600;
+assign data_rom[23] = 16'h9703;
+assign data_rom[24] = 16'h9800;
+assign data_rom[25] = 16'h9936;
+assign data_rom[26] = 16'h9A00;
+assign data_rom[27] = 16'h9B00;
+assign data_rom[28] = 16'h9C00;
+assign data_rom[29] = 16'h9D00;
+assign data_rom[30] = 16'h9E00;
+
+assign data_rom[2] = 16'h9F10;//divout 
+assign data_rom[3] = {8'hA0,data2[7:0]};//divout low
+
+assign data_rom[33] = 16'hA100;
+assign data_rom[34] = 16'hA200;
+assign data_rom[35] = 16'hA300;
+*/
+
+
+
+assign bbbb_rom[0]  = 16'h8000;//nint_high
+assign bbbb_rom[1]  = 16'h815A;//nint_low
+assign bbbb_rom[2]  = 16'h8275;//nfrac_high
+assign bbbb_rom[3]  = 16'h8340;//nfrac_middle
+assign bbbb_rom[4]  = 16'h847D;//nfrac_low
+assign bbbb_rom[5]  = 16'h850A;
+assign bbbb_rom[6]  = 16'h8682;
+assign bbbb_rom[7]  = 16'h8700;//rdiv_high
+assign bbbb_rom[8]  = 16'h8801;//rdiv_low
+assign bbbb_rom[9]  = 16'h8910;//
+assign bbbb_rom[10] = 16'h8A00;
+assign bbbb_rom[11] = 16'h8B18;
+assign bbbb_rom[12] = 16'h8Cff;
+assign bbbb_rom[13] = 16'h8D00;
+assign bbbb_rom[14] = 16'h8E00;
+assign bbbb_rom[15] = 16'h8F3f;
+assign bbbb_rom[16] = 16'h9000;
+assign bbbb_rom[17] = 16'h9100;
+assign bbbb_rom[18] = 16'h9200;
+assign bbbb_rom[19] = 16'h9314;
+assign bbbb_rom[20] = 16'h9400;
+assign bbbb_rom[21] = 16'h9500;
+assign bbbb_rom[22] = 16'h9648;
+assign bbbb_rom[23] = 16'h9702;
+assign bbbb_rom[24] = 16'h9850;
+assign bbbb_rom[25] = 16'h9900;
+assign bbbb_rom[26] = 16'h9A00;
+assign bbbb_rom[27] = 16'h9B05;
+assign bbbb_rom[28] = 16'h9C40;
+assign bbbb_rom[29] = 16'h9D03;
+assign bbbb_rom[30] = 16'h9E00;
+assign bbbb_rom[31] = 16'h9F00;//div_high
+assign bbbb_rom[32] = 16'hA000;//div_low
+assign bbbb_rom[33] = 16'hA1ff;
+assign bbbb_rom[34] = 16'hA200;
+assign bbbb_rom[35] = 16'hA305;
+assign bbbb_rom[36] = 16'hA400;
+assign bbbb_rom[37] = 16'hA500;
+assign bbbb_rom[38] = 16'hA600;
+assign bbbb_rom[39] = 16'hA700;
+assign bbbb_rom[40] = 16'h98D0;
+assign bbbb_rom[41] = 16'h9850;
+assign bbbb_rom[42] = 16'h970A;
+assign bbbb_rom[43] = 16'h9702;
+assign bbbb_rom[44] = 16'h8CFc;
+assign bbbb_rom[45] = 16'h9C46;
+
+reg [3:0] STATE;
+reg [3:0] NEXTSTATE;
+reg [7:0] wait_cnt;
+reg [5:0] reg_cnt;
+reg [2:0] STATE_TR;
+reg [3:0] bit_cnt;
+reg [15:0]data_tr;
+
+
+always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            yp6000_clk <= 1'b0;
+            yp6000_enb <= 1'b1;
+            yp6000_di  <= 1'b0;
+            STATE      <= 4'b0000;
+            NEXTSTATE  <= 4'b0000;
+            wait_cnt   <= 8'h00;
+            reg_cnt    <= 6'd0;
+            STATE_TR   <= 3'b000;
+            bit_cnt    <= 4'h0;
+            data_tr    <= 16'h0000;
+        end else begin
+            case (STATE)
+                4'b0000: 
+                	begin // Initial State
+                    	reg_cnt <= 6'd0;
+                    	if (wait_cnt == WAIT_CNT_MAX) 
+                        	begin
+                       			wait_cnt <= 8'h00;
+                       			STATE <= 4'b0001;
+                       			NEXTSTATE <= 4'b0001;
+                    		end 
+                        else 
+                        	begin
+                        		wait_cnt <= wait_cnt + 8'h01;
+                    		end
+                	end  
+                4'b0001:
+               		begin // Transmit State
+                    	transmit(bbbb_rom[reg_cnt]);
+                    	NEXTSTATE <= 4'b0010;
+                	end
+                4'b0010:
+               		begin // Check next register
+                    	if (reg_cnt == 6'd45) 
+                        	begin
+                        		reg_cnt <= 6'd0;
+                        		STATE <= 4'b0011; // End state
+                        		NEXTSTATE <= 4'b0011;
+                    		end
+                        else 
+                        	begin
+                        		reg_cnt <= reg_cnt + 6'd1;
+                        		STATE <= 4'b0001; // Back to transmit
+                    		end
+                	end
+                4'b0011:
+                	begin // Final state
+                    	if(trans_en&&ld)
+                        	begin
+                            	STATE <= 4'b0100; // End state
+                                trans_finish2<=1'd0;
+
+                            end
+                        else
+                        	begin
+                            	STATE <= STATE; // End state
+                            end
+                	end
+                4'b0100:
+                	begin
+                    	if(ld)
+                        	begin
+                                if(ld_cnt > 40'h7ff)
+                                	begin
+                                    	STATE <= 4'b0101;
+                                        ld_cnt	  <=40'h0;
+                                    end
+                                else
+                                	begin
+                                    	ld_cnt<=ld_cnt+1'b1;
+                                    end
+                            end
+                        else
+                        	begin
+                            	STATE <= 4'b0100;
+                                ld_cnt<=40'h0;
+                            end
+                    	
+                    end
+                4'b0101:
+                	begin
+                    	transmit(data_rom[reg_cnt]);
+                    	NEXTSTATE <= 4'b0110;
+                    end
+                4'b0110:
+               		begin // Check next register
+                    	if (reg_cnt == 6'd9) 
+                        	begin
+                        		reg_cnt <= 6'd0;
+                        		STATE <= 4'b0111; // End state
+                        		NEXTSTATE <= 4'b0111;
+                    		end
+                        else 
+                        	begin
+                        		reg_cnt <= reg_cnt + 6'd1;
+                        		STATE <= 4'b0101; // Back to transmit
+                    		end
+                	end
+                4'b0111:
+                	begin
+                    	trans_finish2<=1'd1;
+                        STATE<=4'b1000;
+                        /*if(gap == 6'd63)
+                        	begin
+                            	
+                                gap<=6'd0;
+                            end
+                        else
+                        	begin
+                            	gap<=gap+1'd1;
+                            end*/
+                    end
+                4'b1000:
+                	begin
+                    	if(!trans_en)
+                        	begin
+                            	trans_finish2<=1'd0;
+                            	STATE <= 4'b0011;
+                            end
+                        else
+                        	begin
+                            	STATE<=STATE;
+                            end
+                    end
+               	default: STATE <= 4'b0000; // Reset to initial state
+            endcase
+        end
+    end
+
+task transmit;
+input [15:0] data_in;
+    begin
+        case (STATE_TR)
+            3'b000: begin
+                data_tr <= data_in;
+                bit_cnt <= 4'h0;
+                STATE_TR <= 3'b001;
+            end
+            3'b001: begin
+                yp6000_enb <= 1'b0;
+                STATE_TR <= 3'b010;
+            end
+            3'b010: begin
+                STATE_TR <= 3'b011;
+            end
+            3'b011: begin
+                yp6000_clk <= 1'b1;
+                yp6000_di  <= data_tr[15];
+                STATE_TR <= 3'b100;
+            end
+            3'b100: begin
+                yp6000_clk <= 1'b0;
+                STATE_TR <= 3'b101;
+            end
+            3'b101: begin
+                data_tr <= {data_tr[14:0], 1'b0};
+                if (bit_cnt == 4'hF) begin
+                    bit_cnt <= 4'h0;
+                    STATE_TR <= 3'b110;
+                end else begin
+                    bit_cnt <= bit_cnt + 4'h1;
+                    STATE_TR <= 3'b011;
+                end
+            end
+            3'b110: begin
+                yp6000_enb <= 1'b1;
+                STATE_TR <= 3'b111;
+            end
+            3'b111: begin
+                STATE_TR <= 3'b000;
+                STATE <= NEXTSTATE;
+            end
+        endcase
+    end
+endtask
+
+endmodule

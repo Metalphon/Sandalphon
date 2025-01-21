@@ -1,0 +1,6 @@
+Info (10281): Verilog HDL Declaration information at iic.v(23): object "ACK" differs only in case from object "ack" in the same scope File: E:/repo/FPGA-code/repo/HT_detect(2)/rtl/iic.v Line: 23
+Info (10281): Verilog HDL Declaration information at iic.v(14): object "IDLE" differs only in case from object "idle" in the same scope File: E:/repo/FPGA-code/repo/HT_detect(2)/rtl/iic.v Line: 14
+Info (10281): Verilog HDL Declaration information at display.v(27): object "STATE" differs only in case from object "state" in the same scope File: E:/repo/FPGA-code/repo/HT_detect(2)/rtl/display.v Line: 27
+Info (10281): Verilog HDL Declaration information at display.v(23): object "WRITE" differs only in case from object "write" in the same scope File: E:/repo/FPGA-code/repo/HT_detect(2)/rtl/display.v Line: 23
+Info (10281): Verilog HDL Declaration information at bcd.v(5): object "t_data" differs only in case from object "T_data" in the same scope File: E:/repo/FPGA-code/repo/HT_detect(2)/rtl/bcd.v Line: 5
+Info (10281): Verilog HDL Declaration information at bcd.v(6): object "h_data" differs only in case from object "H_data" in the same scope File: E:/repo/FPGA-code/repo/HT_detect(2)/rtl/bcd.v Line: 6

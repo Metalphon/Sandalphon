@@ -1,0 +1,11 @@
+随意放在一个头文件中，main.c引用该文件即可
+#include "stdio.h"
+#ifdef __GNUC__
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif
+PUTCHAR_PROTOTYPE {
+    HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 1000);
+    return ch;
+}
+
+printf("fuck you");

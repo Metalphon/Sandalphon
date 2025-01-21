@@ -1,0 +1,313 @@
+ 39
+Vishay
+CRCW0603000ZRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+0
+0.05
+0.1
+Vishay
+CRCW0603100JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+10
+0.05
+0.1
+Vishay
+CRCW0603180JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+18
+0.05
+0.1
+Vishay
+CRCW0603220JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+22
+0.05
+0.1
+Vishay
+CRCW0603270JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+27
+0.05
+0.1
+Vishay
+CRCW0603300JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+30
+0.05
+0.1
+Vishay
+CRCW0603330JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+33
+0.05
+0.1
+Vishay
+CRCW0603390JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+39
+0.05
+0.1
+Vishay
+CRCW0603510JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+51
+0.05
+0.1
+Vishay
+CRCW0603750JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+75
+0.05
+0.1
+Vishay
+CRCW0603101JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+100
+0.05
+0.1
+Vishay
+CRCW0603221JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+220
+0.05
+0.1
+Vishay
+CRCW0603271JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+270
+0.05
+0.1
+Vishay
+CRCW0603331JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+330
+0.05
+0.1
+Vishay
+CRCW0603391JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+390
+0.05
+0.1
+Vishay
+CRCW0603471JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+470
+0.05
+0.1
+Vishay
+CRCW0603561JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+560
+0.05
+0.1
+Vishay
+CRCW0603102JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+1000
+0.05
+0.1
+Vishay
+CRCW0603152JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+1500
+0.05
+0.1
+Vishay
+CRCW0603182JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+1800
+0.05
+0.1
+Vishay
+CRCW0603202JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+2000
+0.05
+0.1
+Vishay
+CRCW0603222JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+2200
+0.05
+0.1
+Vishay
+CRCW0603242JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+2400
+0.05
+0.1
+Vishay
+CRCW0603272JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+2700
+0.05
+0.1
+Vishay
+CRCW0603332JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+3300
+0.05
+0.1
+Vishay
+CRCW0603392JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+3900
+0.05
+0.1
+Vishay
+CRCW0603472JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+4700
+0.05
+0.1
+Vishay
+CRCW0603562JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+5600
+0.05
+0.1
+Vishay
+CRCW0603682JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+6800
+0.05
+0.1
+Vishay
+CRCW0603822JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+8200
+0.05
+0.1
+Vishay
+CRCW0603103JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+10000
+0.05
+0.1
+Vishay
+CRCW0603123JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+12000
+0.05
+0.1
+Vishay
+CRCW0603153JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+15000
+0.05
+0.1
+Vishay
+CRCW0603183JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+18000
+0.05
+0.1
+Vishay
+CRCW0603223JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+22000
+0.05
+0.1
+Vishay
+CRCW0603303JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+30000
+0.05
+0.1
+Vishay
+CRCW0603333JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+33000
+0.05
+0.1
+Vishay
+CRCW0603363JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+36000
+0.05
+0.1
+Vishay
+CRCW0603393JRT1
+603
+http://www.vishay.com/docs/20008/dcrcw.pdf
+Thick Film
+39000
+0.05
+0.1

@@ -1,0 +1,57 @@
+module uart_part 
+(
+	input clk,
+	input reset,
+	input tx_data_valid,
+	input [7:0]tx_data_in,
+	output bps_en_tx,
+	output wifi_tx
+);
+wire	bps_clk_tx;
+Baud Baud_tx
+(
+.clk					(clk			),	//系统时钟 12MHz
+.rst_n					(reset			),	//系统复位，低有效
+.bps_en					(bps_en_tx		),	//接收时钟使能
+.bps_clk				(bps_clk_tx		)	//接收时钟输出
+);
+
+Uart_Tx Uart_Tx_uut
+(
+.clk					(clk			),	//系统时钟 12MHz
+.rst_n					(reset			),	//系统复位，低有效
+
+.bps_en					(bps_en_tx		),	//发送时钟使能
+.bps_clk				(bps_clk_tx		),	//发送时钟输入
+
+.tx_data_valid			(tx_data_valid	),	//发送数据有效脉冲
+.tx_data_in				(tx_data_in		),	//要发送的数据
+.uart_tx				(wifi_tx		)	//UART发送输出
+);
+
+/////////////////////////////////uart_rx module////////////////////////////////////
+Baud Baud_rx
+(	
+.clk					(clk			),	//系统时钟 12MHz
+.rst_n					(reset			),	//系统复位，低有效
+.bps_en					(bps_en_rx		),	//接收时钟使能
+.bps_clk				(bps_clk_rx		)	//接收时钟输出
+);
+wire					bps_en_rx,bps_clk_rx;
+wire					rx_data_valid;
+wire		[7:0]		rx_data_out;
+Uart_Rx Uart_Rx_uut
+(
+.clk					(clk			),	//系统时钟 12MHz
+.rst_n					(reset			),	//系统复位，低有效
+
+.bps_en					(bps_en_rx		),	//接收时钟使能
+.bps_clk				(bps_clk_rx		),	//接收时钟输入
+
+.uart_rx				(wifi_rx		),	//UART接收输入
+.rx_data_valid			(rx_data_valid	),	//接收数据有效脉冲
+.rx_data_out			(rx_data_out	)	//接收到的数据
+);
+
+
+endmodule 

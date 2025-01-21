@@ -1,0 +1,225 @@
+module yp3000brs_spi(
+    input      clk,
+    input      reset,
+	output reg yp3000_clk,
+	output reg yp3000_enb,
+	output reg yp3000_di
+    );
+
+
+
+wire[15:0]data_rom[35:0];
+
+assign data_rom[0]  = 16'h8000;//nint high
+assign data_rom[1]  = 16'h8136;//nint low
+assign data_rom[2]  = 16'h8266;//nfrac
+assign data_rom[3]  = 16'h8366;//nfrac
+assign data_rom[4]  = 16'h8466;//nfrac
+assign data_rom[5]  = 16'h8500;//seed
+assign data_rom[6]  = 16'h8600;//
+assign data_rom[7]  = 16'h8700;//rdiv en
+assign data_rom[8]  = 16'h8801;//rdiv low
+assign data_rom[9]  = 16'h8900;//vcobuf
+assign data_rom[10] = 16'h8A00;//vcoen
+assign data_rom[11] = 16'h8B00;//current
+assign data_rom[12] = 16'h8C00;//cp current
+assign data_rom[13] = 16'h8D00;//cp
+assign data_rom[14] = 16'h8E00;//cp
+assign data_rom[15] = 16'h8F00;//cp
+assign data_rom[16] = 16'h9000;//current
+assign data_rom[17] = 16'h9100;//
+assign data_rom[18] = 16'h9200;
+assign data_rom[19] = 16'h9300;
+assign data_rom[20] = 16'h9400;
+assign data_rom[21] = 16'h9500;
+assign data_rom[22] = 16'h9600;
+assign data_rom[23] = 16'h9703;
+assign data_rom[24] = 16'h9800;
+assign data_rom[25] = 16'h9936;
+assign data_rom[26] = 16'h9A00;
+assign data_rom[27] = 16'h9B00;
+assign data_rom[28] = 16'h9C00;
+assign data_rom[29] = 16'h9D00;
+assign data_rom[30] = 16'h9E00;
+assign data_rom[31] = 16'h9F10;//divout 
+assign data_rom[32] = 16'hA004;//divout low
+assign data_rom[33] = 16'hA100;
+assign data_rom[34] = 16'hA200;
+assign data_rom[35] = 16'hA300;
+
+
+
+/*
+assign data_rom[0]  = 16'h8000;
+assign data_rom[1]  = 16'h812A;
+assign data_rom[2]  = 16'h8200;
+assign data_rom[3]  = 16'h8300;
+assign data_rom[4]  = 16'h8400;
+assign data_rom[5]  = 16'h850A;
+assign data_rom[6]  = 16'h863D;
+assign data_rom[7]  = 16'h8700;
+assign data_rom[8]  = 16'h8800;
+assign data_rom[9]  = 16'h8900;
+assign data_rom[10] = 16'h8A00;
+assign data_rom[11] = 16'h8B00;
+assign data_rom[12] = 16'h8CF0;
+assign data_rom[13] = 16'h8D01;
+assign data_rom[14] = 16'h8E00;
+assign data_rom[15] = 16'h8F80;
+assign data_rom[16] = 16'h9020;
+assign data_rom[17] = 16'h9100;
+assign data_rom[18] = 16'h9200;
+assign data_rom[19] = 16'h936C;
+assign data_rom[20] = 16'h9424;
+assign data_rom[21] = 16'h95FF;
+assign data_rom[22] = 16'h966A;
+assign data_rom[23] = 16'h9703;
+assign data_rom[24] = 16'h9830;
+assign data_rom[25] = 16'h9933;
+assign data_rom[26] = 16'h9A03;
+assign data_rom[27] = 16'h9B05;
+assign data_rom[28] = 16'h9C00;
+assign data_rom[29] = 16'h9D03;
+assign data_rom[30] = 16'h9E00;
+assign data_rom[31] = 16'h9F10;
+assign data_rom[32] = 16'hA001;
+assign data_rom[33] = 16'hA100;
+assign data_rom[34] = 16'hA264;
+assign data_rom[35] = 16'hA305;
+*/
+
+reg [1:0] STATE;
+reg [1:0] NEXTSTATE;
+reg [7:0] wait_cnt;
+reg [5:0] reg_cnt;
+reg [2:0] STATE_TR;
+reg [3:0] bit_cnt;
+reg [15:0]data_tr;
+
+
+always @(posedge clk)
+	begin
+		if(reset == 1'b1)
+			begin
+				yp3000_clk <= 1'b0;
+				yp3000_enb <= 1'b1;
+				yp3000_di  <= 1'b0;
+				STATE      <= 2'b00;
+				NEXTSTATE  <= 2'b00;
+				wait_cnt   <= 8'h00;
+				reg_cnt    <= 6'd0;
+				STATE_TR   <= 3'b000;
+				bit_cnt    <= 4'h0;
+				data_tr    <= 16'h0000;
+			end
+		else
+			begin
+				case(STATE)
+					2'b00:
+						begin
+							reg_cnt    <= 6'd0;
+							if(wait_cnt == 8'hF0)
+								begin
+									wait_cnt <= 8'h00;
+									STATE      <= 2'b01;
+									NEXTSTATE  <= 2'b01;
+								end
+							else
+								begin
+									wait_cnt <= wait_cnt + 8'h01;
+									STATE      <= 2'b00;
+									NEXTSTATE  <= 2'b00;
+								end
+						end
+					2'b01:
+						begin
+							transmit(data_rom[reg_cnt]);
+							NEXTSTATE  <= 2'b10;
+						end
+					2'b10:
+						begin
+							if(reg_cnt == 6'd35)
+								begin
+									reg_cnt    <= 6'd0;
+									STATE      <= 2'b11;
+									NEXTSTATE  <= 2'b11;
+								end
+							else
+								begin
+									reg_cnt    <= reg_cnt + 6'd1;
+									STATE      <= 2'b01;
+									NEXTSTATE  <= 2'b01;
+								end
+						end
+					2'b11:
+						begin
+							STATE      <= 2'b11;
+							NEXTSTATE  <= 2'b11;
+						end
+				endcase
+			end
+	end
+
+
+
+task transmit;
+input[15:0]data_in;
+	begin
+		case(STATE_TR)
+			3'b000:
+				begin
+					data_tr   <= data_in;
+					bit_cnt   <= 4'h0;
+					STATE_TR  <= 3'b001;
+				end
+			3'b001:
+				begin
+					yp3000_enb <= 1'b0;
+					STATE_TR   <= 3'b010;
+				end
+			3'b010:
+				begin
+					STATE_TR   <= 3'b011;
+				end
+			3'b011:
+				begin
+					yp3000_clk <= 1'b1;
+					yp3000_di  <= data_tr[15];
+					STATE_TR   <= 3'b100;
+				end
+			3'b100:
+				begin
+					yp3000_clk <= 1'b0;
+					STATE_TR   <= 3'b101;
+				end
+			3'b101:
+				begin
+					data_tr <= {data_tr[14:0],1'b0};
+					if(bit_cnt == 4'hF)
+						begin
+							bit_cnt  <= 4'h0;
+							STATE_TR <= 3'b110;
+						end
+					else
+						begin
+							bit_cnt  <= bit_cnt + 4'h1;
+							STATE_TR <= 3'b011;
+						end
+				end
+			3'b110:
+				begin
+					yp3000_enb <= 1'b1;
+					STATE_TR   <= 3'b111;
+				end
+			3'b111:
+				begin
+					STATE_TR   <= 3'b000;
+					STATE      <= NEXTSTATE;
+				end
+		endcase
+	end
+endtask
+
+
+
+endmodule
