@@ -1,1 +1,1 @@
-# fuck those who steal my shit
+# genaral way
