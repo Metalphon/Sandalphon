@@ -1,0 +1,27 @@
+# 时钟和复位信号引脚定义
+NET "clk"       LOC = "P17" | IOSTANDARD = LVCMOS33;  # 系统时钟，频率可为50MHz
+NET "rst_n"     LOC = "P15" | IOSTANDARD = LVCMOS33;  # 复位信号，低电平有效
+
+# I2C接口引脚定义 (PCF8591连接)
+NET "scl"       LOC = "P23" | IOSTANDARD = LVCMOS33 | PULLUP;  # I2C时钟线
+NET "sda"       LOC = "P24" | IOSTANDARD = LVCMOS33 | PULLUP;  # I2C数据线
+
+# LCD1602接口引脚定义
+NET "lcd_rs"    LOC = "P29" | IOSTANDARD = LVCMOS33;  # 寄存器选择信号
+NET "lcd_rw"    LOC = "P30" | IOSTANDARD = LVCMOS33;  # 读/写选择信号
+NET "lcd_en"    LOC = "P32" | IOSTANDARD = LVCMOS33;  # 使能信号
+NET "lcd_data[0]" LOC = "P33" | IOSTANDARD = LVCMOS33;  # 数据位0
+NET "lcd_data[1]" LOC = "P34" | IOSTANDARD = LVCMOS33;  # 数据位1
+NET "lcd_data[2]" LOC = "P35" | IOSTANDARD = LVCMOS33;  # 数据位2
+NET "lcd_data[3]" LOC = "P40" | IOSTANDARD = LVCMOS33;  # 数据位3
+NET "lcd_data[4]" LOC = "P41" | IOSTANDARD = LVCMOS33;  # 数据位4
+NET "lcd_data[5]" LOC = "P43" | IOSTANDARD = LVCMOS33;  # 数据位5
+NET "lcd_data[6]" LOC = "P44" | IOSTANDARD = LVCMOS33;  # 数据位6
+NET "lcd_data[7]" LOC = "P45" | IOSTANDARD = LVCMOS33;  # 数据位7
+
+# PWM输出引脚定义
+NET "pwm_out"   LOC = "P46" | IOSTANDARD = LVCMOS33 | SLEW = FAST;  # PWM输出引脚，快速转换速率
+
+# 时钟约束
+NET "clk" TNM_NET = "clk";
+TIMESPEC TS_clk = PERIOD "clk" 20 ns HIGH 50%; 

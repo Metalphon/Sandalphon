@@ -1,0 +1,38 @@
+standard
+***Report Model: main***
+
+IO Statistics
+#IO                        15
+  #input                    2
+  #output                  11
+  #inout                    2
+
+Gate Statistics
+#Basic gates             1662
+  #and                     49
+  #nand                     0
+  #or                     114
+  #nor                      0
+  #xor                      1
+  #xnor                     0
+  #buf                      0
+  #not                     88
+  #bufif1                   1
+  #MX21                  1226
+  #FADD                     0
+  #DFF                    177
+  #LATCH                    6
+#MACRO_ADD                141
+#MACRO_EQ                  93
+#MACRO_MULT                 3
+#MACRO_MUX                198
+
+Report Hierarchy Area:
++-------------------------------------------------------------+
+|Instance            |Module          |gates  |seq    |macros |
++-------------------------------------------------------------+
+|top                 |main            |1479   |183    |237    |
+|  u_adc_i2c         |ADC_I2C         |196    |57     |23     |
+|  u_lcd1602_display |lcd_1602        |229    |73     |42     |
+|  u_voltage_convert |voltage_convert |1054   |53     |172    |
++-------------------------------------------------------------+

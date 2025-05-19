@@ -1,0 +1,53 @@
+standard
+***Report Model: main***
+
+IO Statistics
+#IO                        15
+  #input                    2
+  #output                  11
+  #inout                    2
+
+Utilization Statistics
+#lut                     3256   out of  19600   16.61%
+#reg                      327   out of  19600    1.67%
+#le                      3306
+  #lut only              2979   out of   3306   90.11%
+  #reg only                50   out of   3306    1.51%
+  #lut&reg                277   out of   3306    8.38%
+#dsp                        4   out of     29   13.79%
+#bram                       4   out of     64    6.25%
+  #bram9k                   4
+  #fifo9k                   0
+#bram32k                    0   out of     16    0.00%
+#pad                       15   out of    188    7.98%
+  #ireg                     0
+  #oreg                     0
+  #treg                     0
+#pll                        0   out of      4    0.00%
+
+
+Detailed IO Report
+
+     Name        Direction    Location    IOStandard    DriveStrength    PullType    PackReg  
+      clk          INPUT         H3        LVCMOS33          N/A          PULLUP      NONE    
+     rst_n         INPUT        B16        LVCMOS33          N/A           N/A        NONE    
+  lcd_data[7]     OUTPUT        P11        LVCMOS33           8            NONE       NONE    
+  lcd_data[6]     OUTPUT        M12        LVCMOS33           8            NONE       NONE    
+  lcd_data[5]     OUTPUT         R2        LVCMOS33           8            NONE       NONE    
+  lcd_data[4]     OUTPUT         N3        LVCMOS33           8            NONE       NONE    
+  lcd_data[3]     OUTPUT         M2        LVCMOS33           8            NONE       NONE    
+  lcd_data[2]     OUTPUT         M5        LVCMOS33           8            NONE       NONE    
+  lcd_data[1]     OUTPUT         L3        LVCMOS33           8            NONE       NONE    
+  lcd_data[0]     OUTPUT         L4        LVCMOS33           8            NONE       NONE    
+    lcd_en        OUTPUT         K2        LVCMOS33           8            NONE       NONE    
+    lcd_rs        OUTPUT         K3        LVCMOS33           8            NONE       NONE    
+    lcd_rw        OUTPUT         J3        LVCMOS33           8            NONE       NONE    
+      scl          INOUT        L12        LVCMOS33           8           PULLUP      NONE    
+      sda          INOUT        L13        LVCMOS33           8           PULLUP      NONE    
+
+Report Hierarchy Area:
++----------------------------------------------------------------+
+|Instance |Module |le    |lut    |ripple |seq    |bram   |dsp    |
++----------------------------------------------------------------+
+|top      |main   |3306  |2277   |979    |327    |4      |4      |
++----------------------------------------------------------------+

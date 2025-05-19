@@ -1,0 +1,158 @@
+// --------------------------------------------------------------------
+// >>>>>>>>>>>>>>>>>>>>>>>>> COPYRIGHT NOTICE <<<<<<<<<<<<<<<<<<<<<<<<<
+// --------------------------------------------------------------------
+// Module: DAC_I2C
+// 
+// Author: Step
+// 
+// Description: DAC_I2C
+// 
+// Web: www.stepfpga.com
+//
+// --------------------------------------------------------------------
+// Code Revision History :
+// --------------------------------------------------------------------
+// Version: |Mod. Date:   |Changes Made:
+// V1.1     |2016/10/30   |Initial ver
+// --------------------------------------------------------------------
+module DAC_I2C
+(
+	input				clk_in,		//系统时钟
+	input				rst_n_in,	//系统复位，低有效
+ 
+	output	reg	dac_done,	//DAC采样完成标志
+	input		[7:0]	dac_data,	//DAC采样数据
+ 
+	output			scl_out,	//I2C总线SCL
+	inout				sda_out		//I2C总线SDA
+);
+ 
+	parameter	CNT_NUM	=	15;
+ 
+	localparam	IDLE	=	3'd0;
+	localparam	MAIN	=	3'd1;
+	localparam	START	=	3'd2;
+	localparam	WRITE	=	3'd3;
+	localparam	STOP	=	3'd4;
+ 
+	//根据PCF8591的datasheet，I2C的频率最高为100KHz，
+	//我们准备使用4个节拍完成1bit数据的传输，所以需要400KHz的时钟触发完成该设计
+	//使用计数器分频产生400KHz时钟信号clk_400khz
+	reg					clk_400khz;
+	reg		[9:0]		cnt_400khz;
+	always@(posedge clk_in or negedge rst_n_in) begin
+		if(!rst_n_in) begin
+			cnt_400khz <= 10'd0;
+			clk_400khz <= 1'b0;
+		end else if(cnt_400khz >= CNT_NUM-1) begin
+			cnt_400khz <= 10'd0;
+			clk_400khz <= ~clk_400khz;
+		end else begin
+			cnt_400khz <= cnt_400khz + 1'b1;
+		end
+	end
+ 
+	reg		[7:0]		adc_data_r;
+	reg					scl_out_r;
+	reg					sda_out_r;
+	reg		[2:0]		cnt;
+	reg		[2:0]		cnt_main;
+	reg		[7:0]		data_wr;
+	reg		[2:0]		cnt_start;
+	reg		[2:0]		cnt_write;
+	reg		[2:0]		cnt_stop;
+	reg		[2:0] 		state;
+ 
+	always@(posedge clk_400khz or negedge rst_n_in) begin
+		if(!rst_n_in) begin	//如果按键复位，将相关数据初始化
+			scl_out_r <= 1'd1;
+			sda_out_r <= 1'd1;
+			cnt <= 1'b0;
+			cnt_main <= 1'b0;
+			cnt_start <= 1'b0;
+			cnt_write <= 3'd0;
+			cnt_stop <= 1'd0;
+			dac_done <= 1'b1;
+			state <= IDLE;
+		end else begin
+			case(state)
+				IDLE:begin	//软件自复位，主要用于程序跑飞后的处理
+						scl_out_r <= 1'd1;
+						sda_out_r <= 1'd1;
+						cnt <= 1'b0;
+						cnt_main <= 1'b0;
+						cnt_start <= 1'b0;
+						cnt_write <= 3'd0;
+						cnt_stop <= 1'd0;
+						dac_done <= 1'b1;
+						state <= MAIN;
+					end
+				MAIN:begin
+						if(cnt_main >= 3'd3) cnt_main <= 3'd3;  //对MAIN中的子状态执行控制cnt_main
+						else cnt_main <= cnt_main + 1'b1;
+						case(cnt_main)
+							3'd0:	begin state <= START; end	//I2C通信时序中的START
+							3'd1:	begin data_wr <= 8'h90; state <= WRITE; end	//A0,A1,A2都接了GND，写地址为8'h90
+							3'd2:	begin data_wr <= 8'h40; state <= WRITE; end	//control byte为8'h40，打开DAC功能
+							3'd3:	begin data_wr <= dac_data; state <= WRITE; dac_done <= 1'b0; end	//需要进行DAC转换的数据
+							3'd4:	begin state <= STOP; end	//I2C通信时序中的结束STOP
+							default: state <= IDLE;	//如果程序失控，进入IDLE自复位状态
+						endcase
+					end
+				START:begin	//I2C通信时序中的起始START
+						if(cnt_start >= 3'd5) cnt_start <= 1'b0;	//对START中的子状态执行控制cnt_start
+						else cnt_start <= cnt_start + 1'b1;
+						case(cnt_start)
+							3'd0:	begin sda_out_r <= 1'b1; scl_out_r <= 1'b1; end	//将SCL和SDA拉高，保持4.7us以上
+							3'd1:	begin sda_out_r <= 1'b1; scl_out_r <= 1'b1; end	//clk_400khz每个周期2.5us，需要两个周期
+							3'd2:	begin sda_out_r <= 1'b0; end	//SDA拉低到SCL拉低，保持4.0us以上
+							3'd3:	begin sda_out_r <= 1'b0; end	//clk_400khz每个周期2.5us，需要两个周期
+							3'd4:	begin scl_out_r <= 1'b0; end	//SCL拉低，保持4.7us以上
+							3'd5:	begin scl_out_r <= 1'b0; state <= MAIN; end	//clk_400khz每个周期2.5us，需要两个周期，返回MAIN
+							default: state <= IDLE;	//如果程序失控，进入IDLE自复位状态
+						endcase
+					end
+				WRITE:begin	//I2C通信时序中的写操作WRITE和相应判断操作ACK
+						if(cnt <= 3'd6) begin	//共需要发送8bit的数据，这里控制循环的次数
+							if(cnt_write >= 3'd3) begin cnt_write <= 1'b0; cnt <= cnt + 1'b1; end
+							else begin cnt_write <= cnt_write + 1'b1; cnt <= cnt; end
+						end else begin
+							if(cnt_write >= 3'd7) begin cnt_write <= 1'b0; cnt <= 1'b0; end	//两个变量都恢复初值
+							else begin cnt_write <= cnt_write + 1'b1; cnt <= cnt; end
+						end
+						case(cnt_write)
+							//按照I2C的时序传输数据
+							3'd0:	begin scl_out_r <= 1'b0; sda_out_r <= data_wr[7-cnt]; end	//SCL拉低，并控制SDA输出对应的位
+							3'd1:	begin scl_out_r <= 1'b1; end	//SCL拉高，保持4.0us以上
+							3'd2:	begin scl_out_r <= 1'b1; end	//clk_400khz每个周期2.5us，需要两个周期
+							3'd3:	begin scl_out_r <= 1'b0; end	//SCL拉低，准备发送下1bit的数据
+							//获取从设备的响应信号并判断
+							3'd4:	begin sda_out_r <= 1'bz; dac_done <= 1'b1; end	//释放SDA线，准备接收从设备的响应信号
+							3'd5:	begin scl_out_r <= 1'b1; end	//SCL拉高，保持4.0us以上
+							3'd6:	begin if(sda_out) state <= IDLE; else state <= state; end	//获取从设备的响应信号并判断
+							3'd7:	begin scl_out_r <= 1'b0; state <= MAIN; end	//SCL拉低，返回MAIN状态
+							default: state <= IDLE;	//如果程序失控，进入IDLE自复位状态
+						endcase
+					end
+				STOP:begin	//I2C通信时序中的结束STOP
+						if(cnt_stop >= 3'd5) cnt_stop <= 1'b0;	//对STOP中的子状态执行控制cnt_stop
+						else cnt_stop <= cnt_stop + 1'b1;
+						case(cnt_stop)
+							3'd0:	begin sda_out_r <= 1'b0; end	//SDA拉低，准备STOP
+							3'd1:	begin sda_out_r <= 1'b0; end	//SDA拉低，准备STOP
+							3'd2:	begin scl_out_r <= 1'b1; end	//SCL提前SDA拉高4.0us
+							3'd3:	begin scl_out_r <= 1'b1; end	//SCL提前SDA拉高4.0us
+							3'd4:	begin sda_out_r <= 1'b1; end	//SDA拉高
+							3'd5:	begin sda_out_r <= 1'b1; state <= MAIN; end	//完成STOP操作，返回MAIN状态
+							default: state <= IDLE;	//如果程序失控，进入IDLE自复位状态
+						endcase
+					end
+				default:;
+			endcase
+		end
+	end
+ 
+	assign	scl_out = scl_out_r;	//对SCL端口赋值
+	assign	sda_out = sda_out_r;	//对SDA端口赋值
+ 
+endmodule 

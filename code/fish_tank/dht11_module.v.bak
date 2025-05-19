@@ -1,0 +1,143 @@
+module dht11_module(
+    input clk,              // System clock input
+    input rst_n,           // Reset signal input, active low
+    inout dht11_data,      // DHT11 bidirectional data line
+    output reg [7:0] temp_value,  // Temperature value output
+    output reg [7:0] humi_value   // Humidity value output
+);
+
+    // Parameters for timing
+    parameter CLK_FREQ = 50_000_000;  // 50MHz system clock
+    parameter US_CYCLES = CLK_FREQ/1_000_000;  // Cycles per microsecond
+    parameter MS_CYCLES = CLK_FREQ/1_000;      // Cycles per millisecond
+
+    // State machine states
+    parameter IDLE = 4'd0;
+    parameter START = 4'd1;
+    parameter WAIT_RESPONSE = 4'd2;
+    parameter CHECK_RESPONSE = 4'd3;
+    parameter READ_DATA = 4'd4;
+    parameter VERIFY = 4'd5;
+    parameter UPDATE = 4'd6;
+    parameter DELAY = 4'd7;
+
+    // Internal registers
+    reg [3:0] state;
+    reg [19:0] delay_cnt;
+    reg [7:0] bit_cnt;
+    reg [39:0] received_data;  // 40 bits total: 8bit RH + 8bit RL + 8bit TH + 8bit TL + 8bit check
+    reg dht11_out;            // Output control
+    reg dht11_out_en;         // Output enable
+    reg [7:0] retry_cnt;
+
+    // Bidirectional data control
+    assign dht11_data = dht11_out_en ? dht11_out : 1'bz;
+    wire dht11_in = dht11_data;
+
+    // Main state machine
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= IDLE;
+            delay_cnt <= 0;
+            bit_cnt <= 0;
+            received_data <= 0;
+            dht11_out <= 1'b1;
+            dht11_out_en <= 1'b0;
+            temp_value <= 8'd0;
+            humi_value <= 8'd0;
+            retry_cnt <= 8'd0;
+        end
+        else begin
+            case (state)
+                IDLE: begin
+                    if (delay_cnt >= MS_CYCLES * 2000) begin  // 2 second interval
+                        state <= START;
+                        delay_cnt <= 0;
+                        dht11_out_en <= 1'b1;
+                        dht11_out <= 1'b0;
+                    end
+                    else begin
+                        delay_cnt <= delay_cnt + 1'b1;
+                    end
+                end
+
+                START: begin
+                    if (delay_cnt >= MS_CYCLES * 18) begin  // 18ms low pulse
+                        dht11_out <= 1'b1;
+                        delay_cnt <= 0;
+                        state <= WAIT_RESPONSE;
+                        dht11_out_en <= 1'b0;  // Switch to input
+                    end
+                    else begin
+                        delay_cnt <= delay_cnt + 1'b1;
+                    end
+                end
+
+                WAIT_RESPONSE: begin
+                    if (delay_cnt >= US_CYCLES * 40) begin  // Wait 40us
+                        state <= CHECK_RESPONSE;
+                        delay_cnt <= 0;
+                        retry_cnt <= 0;
+                    end
+                    else begin
+                        delay_cnt <= delay_cnt + 1'b1;
+                    end
+                end
+
+                CHECK_RESPONSE: begin
+                    if (!dht11_in) begin  // Check for low response
+                        state <= READ_DATA;
+                        delay_cnt <= 0;
+                        bit_cnt <= 0;
+                    end
+                    else if (retry_cnt >= 100) begin  // Timeout
+                        state <= IDLE;
+                    end
+                    else begin
+                        retry_cnt <= retry_cnt + 1'b1;
+                        delay_cnt <= delay_cnt + 1'b1;
+                    end
+                end
+
+                READ_DATA: begin
+                    if (bit_cnt >= 40) begin  // All bits received
+                        state <= VERIFY;
+                    end
+                    else if (delay_cnt >= US_CYCLES * 50) begin  // Sample after 50us
+                        received_data <= {received_data[38:0], dht11_in};
+                        bit_cnt <= bit_cnt + 1'b1;
+                        delay_cnt <= 0;
+                    end
+                    else begin
+                        delay_cnt <= delay_cnt + 1'b1;
+                    end
+                end
+
+                VERIFY: begin
+                    // Check if checksum matches
+                    if ((received_data[39:32] + received_data[31:24] + 
+                         received_data[23:16] + received_data[15:8]) == received_data[7:0]) begin
+                        state <= UPDATE;
+                    end
+                    else begin
+                        state <= IDLE;
+                    end
+                end
+
+                UPDATE: begin
+                    humi_value <= received_data[39:32];  // Humidity integer part
+                    temp_value <= received_data[23:16];  // Temperature integer part
+                    state <= DELAY;
+                    delay_cnt <= 0;
+                end
+
+                DELAY: begin
+                    state <= IDLE;
+                end
+
+                default: state <= IDLE;
+            endcase
+        end
+    end
+
+endmodule

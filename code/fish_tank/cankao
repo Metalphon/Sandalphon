@@ -1,0 +1,326 @@
+#include "stm32l4xx_hal.h"
+#include <stdio.h>
+#include <math.h>
+#include "SO2_I2C.h"
+#include "Uart.h"
+//---------定义变量--------------
+uint8_t  Register_Data=0; //读取max30102寄存器数据
+uint8_t  temp_num=0;
+uint8_t  So2_Buf[60]={ 0 }; //第一组数据缓冲区
+uint8_t  So2_Buf2[60]={ 0 };//第二组数据缓冲区
+uint8_t  So2_Send_flag=0;
+
+//---------声明的外部变量---------
+//extern UART_HandleTypeDef huart1;
+
+uint16_t so2_time=0;  //血氧数据采集时间
+//int fputc(int ch, FILE *f)
+
+//{
+//		HAL_UART_Transmit(&huart1, (uint8_t *)&ch,1, 0xFFFF);
+//		return ch;
+//}
+
+//--------MAX30102寄存器的设置参数-------------------------
+
+#define SAMPLE_50   //如果定义此宏就是50采样率   否则是100
+
+#define INTERRUPT_REG  							0X00
+#define INTERRUPT_REG_A_FULL  					(0X01<<7)
+#define INTERRUPT_REG_PPG_RDY  				  (0X01<<6)
+#define INTERRUPT_REG_ALC_OVF  				  (0X01<<5)  
+#define INTERRUPT_REG_PROX_INT 				  (0X01<<4)
+#define INTERRUPT_REG_PWR_RDY  				  (0X01<<0)
+
+#define INTERRUPT_ENABLE_REG  					   0X02
+#define INTERRUPT_ENABLE_REG_A_FULL_EN 		(0X01<<7)
+#define INTERRUPT_ENABLE_REG_PPG_RDY_EN		(0X01<<6)
+#define INTERRUPT_ENABLE_REG_ALC_OVF_EN  	(0X01<<5)  
+#define INTERRUPT_ENABLE_REG_PROX_INT_EN 	(0X01<<4)
+
+#define INTERRUPT_DIE_TEMP_REG  					0X03
+#define INTERRUPT_DIE_TEMP_REG_DIE_TEMP_EN 		(0X01<<1)
+
+#define INTERRUPT_FIFO_WR_PTR_REG  					0X04
+#define INTERRUPT_OVF_COUNTER_REG  					0X05
+#define INTERRUPT_RD_PTR_REG  						  0X06
+#define INTERRUPT_FIF0_DATA_REG  						0X07
+
+#define INTERRUPT_FIFO_CONFIG_REG  					         0X08
+#define INTERRUPT_FIFO_CONFIG_REG_SMP_AVE  			    (0X00<<5)  //SPM_AVE[2:0] = 000 不要 样本平均
+#define INTERRUPT_FIFO_CONFIG_REG_FIFO_ROLLOVER_EN  (0X01<<4)  //  自动翻转fifo
+#define INTERRUPT_FIFO_CONFIG_REG_FIFO_ALL_FULL		  (0X0F<<0)  // READ 17 data  for one  interrupt
+
+
+#define INTERRUPT_MODE_CONFIG_REG  					0X09
+#define INTERRUPT_MODE_CONFIG_REG_SHDN 				(0X00<<7)  // shutdown control
+#define INTERRUPT_MODE_CONFIG_REG_RESET				(0X00<<6)  // reset  control
+#define INTERRUPT_MODE_CONFIG_REG_MODE				(0X03<<0)  // Spo2  mode
+
+
+#define INTERRUPT_SPO2_CONFIG_REG  					0X0a
+#define INTERRUPT_SPO2_CONFIG_REG_ADC_RGE 			(0X03<<5)  // SP02_ADC_RGE[1:0]=11
+
+#ifdef SAMPLE_50
+#define INTERRUPT_SPO2_CONFIG_REG_SR 				(0X00<<2)  // SP02_SR[2:0]=000     Sample Rate = 50
+#else
+#define INTERRUPT_SPO2_CONFIG_REG_SR 				(0X01<<2)  // SP02_SR[2:0]=001     Sample Rate = 100
+#endif
+
+#define INTERRUPT_SPO2_CONFIG_REG_LED_PW		(0X03<<0)  // SP02_LED_PW[1:0]=11
+
+#define INTERRUPT_LED1_PA_REG  					     0X0C
+#define INTERRUPT_LED2_PA_REG  					     0X0D
+
+#define ONES_READ_DATA_BY_FIFO		(32-INTERRUPT_FIFO_CONFIG_REG_FIFO_ALL_FULL)  // READ NUM  data  for one  interrupt
+
+#define max30102_WR_address 0xAE
+
+uint32_t fifo_word_buff[ONES_READ_DATA_BY_FIFO][2];
+
+uint8_t max30102_Bus_Write(uint8_t Register_Address, uint8_t Word_Data)
+{
+
+	/* 采用串行EEPROM随即读取指令序列，连续读取若干字节 */
+
+	/* 第1步：发起I2C总线启动信号 */
+	i2c_Start();
+
+	/* 第2步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读 */
+	i2c_SendByte(max30102_WR_address | I2C_WR);	/* 此处是写指令 */
+
+	/* 第3步：发送ACK */
+	if (i2c_WaitAck() != 0)
+	{
+		goto cmd_fail;	/* EEPROM器件无应答 */
+	}
+
+	/* 第4步：发送字节地址 */
+	i2c_SendByte(Register_Address);
+
+	if (i2c_WaitAck() != 0)
+	{
+		goto cmd_fail;	/* EEPROM器件无应答 */
+	}
+	
+	/* 第5步：开始写入数据 */
+	i2c_SendByte(Word_Data);
+
+	/* 第6步：发送ACK */
+	if (i2c_WaitAck() != 0)
+	{
+		goto cmd_fail;	/* EEPROM器件无应答 */
+	}
+
+	/* 发送I2C总线停止信号 */
+	i2c_Stop();
+	return 1;	/* 执行成功 */
+
+cmd_fail: /* 命令执行失败后，切记发送停止信号，避免影响I2C总线上其他设备 */
+	/* 发送I2C总线停止信号 */
+	i2c_Stop();
+	return 0;
+}
+
+
+
+uint8_t max30102_Bus_Read(uint8_t Register_Address)
+{
+	//uint8_t  Register_Data;
+
+
+	/* 第1步：发起I2C总线启动信号 */
+	i2c_Start();
+
+	/* 第2步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读 */
+	i2c_SendByte(max30102_WR_address | I2C_WR);	/* 此处是写指令 */
+
+	/* 第3步：发送ACK */
+	if (i2c_WaitAck() != 0)
+	{
+		goto cmd_fail;	/* EEPROM器件无应答 */
+	}
+
+	/* 第4步：发送字节地址， */
+	i2c_SendByte((uint8_t)Register_Address);
+	if (i2c_WaitAck() != 0)
+	{
+		goto cmd_fail;	/* EEPROM器件无应答 */
+	}
+	
+
+	/* 第6步：重新启动I2C总线。下面开始读取数据 */
+	i2c_Start();
+
+	/* 第7步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读 */
+	i2c_SendByte(max30102_WR_address | I2C_RD);	/* 此处是读指令 */
+
+	/* 第8步：发送ACK */
+	if (i2c_WaitAck() != 0)
+	{
+		goto cmd_fail;	/* EEPROM器件无应答 */
+	}
+
+	/* 第9步：读取数据 */
+	{
+		  Register_Data = i2c_ReadByte();	/* 读1个字节 */
+		 
+
+		i2c_NAck();	/* 最后1个字节读完后，CPU产生NACK信号(驱动SDA = 1) */
+	}
+	/* 发送I2C总线停止信号 */
+	i2c_Stop();
+	return Register_Data;	/* 执行成功 返回data值 */
+
+cmd_fail: /* 命令执行失败后，切记发送停止信号，避免影响I2C总线上其他设备 */
+	/* 发送I2C总线停止信号 */
+	i2c_Stop();
+	return 0;
+}
+
+
+void max30102_FIFO_Read(uint8_t Register_Address,uint32_t  Word_Data[][2],uint8_t count)
+{
+	uint8_t i=0;
+	uint8_t no = count;
+	uint8_t data1, data2,data3;
+	/* 第1步：发起I2C总线启动信号 */
+	i2c_Start();
+
+	/* 第2步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读 */
+	i2c_SendByte(max30102_WR_address | I2C_WR);	/* 此处是写指令 */
+
+	/* 第3步：发送ACK */
+	if (i2c_WaitAck() != 0)
+	{
+		goto cmd_fail;	/* EEPROM器件无应答 */
+	}
+
+	/* 第4步：发送字节地址， */
+	i2c_SendByte((uint8_t)Register_Address);
+	if (i2c_WaitAck() != 0)
+	{
+		goto cmd_fail;	/* EEPROM器件无应答 */
+	}
+	
+
+	/* 第6步：重新启动I2C总线。下面开始读取数据 */
+	i2c_Start();
+
+	/* 第7步：发起控制字节，高7bit是地址，bit0是读写控制位，0表示写，1表示读 */
+	i2c_SendByte(max30102_WR_address | I2C_RD);	/* 此处是读指令 */
+
+	/* 第8步：发送ACK */
+	if (i2c_WaitAck() != 0)
+	{
+		goto cmd_fail;	/* EEPROM器件无应答 */
+	}
+
+	/* 第9步：读取数据 */
+	while (no)
+	{
+		data1 = i2c_ReadByte();	
+		i2c_Ack();
+		data2 = i2c_ReadByte();
+		i2c_Ack();
+		data3 = i2c_ReadByte();
+		i2c_Ack();
+		Word_Data[i][0] = ( (((uint32_t)data1 << 16)&0X30000) | (((uint16_t)data2 << 8)&0XFF00) | data3);  //
+
+		
+		data1 = i2c_ReadByte();	
+		i2c_Ack();
+		data2 = i2c_ReadByte();
+		i2c_Ack();
+		data3 = i2c_ReadByte();
+		if(1==no)
+			i2c_NAck();	// 最后1个字节读完后，CPU产生NACK信号(驱动SDA = 1) 
+		else
+			i2c_Ack();
+		Word_Data[i][1] = ( (((uint32_t)data1 << 16)&0X30000) | (((uint16_t)data2 << 8)&0XFF00) | data3);  //
+
+		no--;	
+		i++;
+	}
+	/* 发送I2C总线停止信号 */
+	i2c_Stop();
+
+cmd_fail: /* 命令执行失败后，切记发送停止信号，避免影响I2C总线上其他设备 */
+	/* 发送I2C总线停止信号 */
+	i2c_Stop();
+}
+/***************************
+*  函数名称：max30102_init()
+*  函数功能：血氧模块的初始化
+*  函数输入:	无	
+*  函数输出:	无                             
+***************************/
+void max30102_init(void)
+{
+	
+	max30102_Bus_Write(INTERRUPT_ENABLE_REG, 0xf0);//延时
+	max30102_Bus_Write(INTERRUPT_ENABLE_REG, INTERRUPT_ENABLE_REG_A_FULL_EN |
+												INTERRUPT_ENABLE_REG_PPG_RDY_EN  |
+												INTERRUPT_ENABLE_REG_ALC_OVF_EN  |
+												INTERRUPT_ENABLE_REG_PROX_INT_EN); //all interrupt enable
+
+	max30102_Bus_Write(INTERRUPT_DIE_TEMP_REG, INTERRUPT_DIE_TEMP_REG_DIE_TEMP_EN); //DIE_TEMP_RDY_EN
+
+	max30102_Bus_Write(INTERRUPT_FIFO_WR_PTR_REG, 0x00);   //set FIFO write Pointer reg = 0x00 for clear it
+	max30102_Bus_Write(INTERRUPT_OVF_COUNTER_REG, 0x00);	//set Over Flow Counter  reg = 0x00 for clear it
+	max30102_Bus_Write(INTERRUPT_RD_PTR_REG, 0x00);	//set FIFO Read Pointer  reg = 0x00 for clear it
+
+	max30102_Bus_Write(INTERRUPT_FIFO_CONFIG_REG,  INTERRUPT_FIFO_CONFIG_REG_SMP_AVE|
+													INTERRUPT_FIFO_CONFIG_REG_FIFO_ROLLOVER_EN  |
+													INTERRUPT_FIFO_CONFIG_REG_FIFO_ALL_FULL); 											
+
+	max30102_Bus_Write(INTERRUPT_MODE_CONFIG_REG,  INTERRUPT_MODE_CONFIG_REG_SHDN |
+													INTERRUPT_MODE_CONFIG_REG_RESET  |
+													INTERRUPT_MODE_CONFIG_REG_MODE); 	
+
+	max30102_Bus_Write(INTERRUPT_SPO2_CONFIG_REG,  INTERRUPT_SPO2_CONFIG_REG_ADC_RGE |
+													INTERRUPT_SPO2_CONFIG_REG_SR  |
+													INTERRUPT_SPO2_CONFIG_REG_LED_PW); 	
+
+	
+	//max30102_Bus_Write(INTERRUPT_LED1_PA_REG, 0xe0);	
+	//max30102_Bus_Write(INTERRUPT_LED2_PA_REG, 0xe0);	
+	max30102_Bus_Write(INTERRUPT_LED1_PA_REG, 0x13);	
+	max30102_Bus_Write(INTERRUPT_LED2_PA_REG, 0x13);
+}
+/***************************
+*  函数名称：max30102_fun()
+*  函数功能：血氧模块的初始化
+*  函数输入:	无	
+*  函数输出:	无                             
+***************************/
+void max30102_fun(void)
+{
+
+	uint8_t i=0;
+	 
+		temp_num = max30102_Bus_Read(INTERRUPT_REG);
+		if( INTERRUPT_REG_A_FULL&temp_num )
+		{
+			//printf("%d\r\n",so2_time);//用于检测多久中断一次，大概331ms中断一次，采集17组数据
+			//so2_time=0;
+			max30102_FIFO_Read(INTERRUPT_FIF0_DATA_REG,fifo_word_buff, ONES_READ_DATA_BY_FIFO); //read the hr and spo2 data form fifo 
+			
+			for(i=0;i<ONES_READ_DATA_BY_FIFO;i++)//采集17组数据完成一次中断
+			{				
+				  So2_Buf[i*3]=(uint8_t)fifo_word_buff[i][0];         //把采集到的数据放到发送缓冲区内
+				  So2_Buf[i*3+1]=(uint8_t)(fifo_word_buff[i][0] >> 8 );
+				  So2_Buf[i*3+2]=(uint8_t)(fifo_word_buff[i][0] >> 16 );
+				
+				  So2_Buf2[i*3]=(uint8_t)fifo_word_buff[i][1];         //把采集到的数据放到发送缓冲区内
+				  So2_Buf2[i*3+1]=(uint8_t)(fifo_word_buff[i][1] >> 8 );
+				  So2_Buf2[i*3+2]=(uint8_t)(fifo_word_buff[i][1] >> 16 );
+				  
+				//  printf("%d;%x\r\n",fifo_word_buff[i][0],temp_num);
+			  //	printf("%d\r\n",fifo_word_buff[i][0]);
+				//  printf("%d\r\n",fifo_word_buff[i][1]);
+				//	printf("%d\r\n",ONES_READ_DATA_BY_FIFO);
+			}
+			So2_Send_flag=1;                                        //17组数据存取完成后，置位发送标志
+		}
+}

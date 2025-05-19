@@ -1,0 +1,50 @@
+module alarm_ctrl(
+    input clk,                  // System clock input
+    input rst_n,               // Reset signal input, active low
+    input mq2_alert,           // Gas alert from MQ2 sensor (high: gas detected, low: normal)
+    input [7:0] temperature,   // Temperature value from DHT11
+    output reg buzzer_out,     // Buzzer control (active low)
+    output reg wave_out        // Fan PWM output (25kHz)
+);
+
+    // Parameters
+    parameter TEMP_THRESHOLD = 8'd40;  // Temperature threshold (40°C)
+    parameter HALF_PERIOD = 10'd840;   // For 25kHz wave generation
+    
+    // Internal registers
+    reg [9:0] wave_counter;    // Counter for wave generation
+    reg alarm_condition;       // Combined alarm status
+
+    // Alarm and wave generation logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            buzzer_out <= 1'b1;     // Buzzer off (high)
+            wave_out <= 1'b0;       // Wave output low
+            wave_counter <= 10'd0;
+            alarm_condition <= 1'b0; // No alarm
+        end
+        else begin
+            // Check alarm conditions (temperature threshold or gas detection)
+            alarm_condition <= (temperature >= TEMP_THRESHOLD) || mq2_alert;
+            
+            // Control outputs based on alarm condition
+            buzzer_out <= ~alarm_condition;  // Active low buzzer
+            
+            // Wave generation for fan PWM
+            if (alarm_condition) begin       // Generate PWM when alarm is active
+                if (wave_counter >= HALF_PERIOD - 1) begin
+                    wave_counter <= 10'd0;
+                    wave_out <= ~wave_out;   // Toggle output for PWM
+                end
+                else begin
+                    wave_counter <= wave_counter + 1'b1;
+                end
+            end
+            else begin                      // Stop PWM when no alarm
+                wave_out <= 1'b0;
+                wave_counter <= 10'd0;
+            end
+        end
+    end
+
+endmodule 

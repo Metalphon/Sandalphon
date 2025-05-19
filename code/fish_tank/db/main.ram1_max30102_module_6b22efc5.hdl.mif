@@ -1,0 +1,21 @@
+-- begin_signature
+-- max30102_module
+-- end_signature
+WIDTH=8;
+DEPTH=10;
+
+ADDRESS_RADIX=UNS;
+DATA_RADIX=BIN;
+
+CONTENT BEGIN
+	9 :	00000001;
+	8 :	00000000;
+	7 :	10000000;
+	6 :	00100001;
+	5 :	00100100;
+	4 :	00100100;
+	3 :	00100111;
+	2 :	00000011;
+	1 :	01001111;
+	0 :	01000000;
+END;

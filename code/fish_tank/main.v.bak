@@ -1,0 +1,50 @@
+module main(
+	input clk,          // System clock input
+	input mq2_data,     // MQ-2 sensor data input
+	input dht11_data,   // DHT11 sensor data input
+	inout max30102_sda, // MAX30102 I2C data line
+	output max30102_scl, // MAX30102 I2C clock line
+	output buzzer,      // Buzzer output for MQ-2 alarm
+	output [7:0] temp_value,   // DHT11 temperature value output
+	output [7:0] humi_value,   // DHT11 humidity value output
+	output [15:0] heart_rate,  // MAX30102 heart rate output
+	output [15:0] spo2        // MAX30102 SpO2 output
+);
+
+	// Internal signal definition
+	wire rst_n;  // System reset signal, active low
+
+	// Reset module instantiation
+	rst_module rst_inst(
+		.clk(clk),
+		.rst_n(rst_n)
+	);
+
+	// MQ-2 sensor control module instantiation
+	mq2_module mq2_inst(
+		.clk(clk),
+		.rst_n(rst_n),
+		.mq2_data(mq2_data),
+		.buzzer(buzzer)
+	);
+
+	// DHT11 sensor control module instantiation
+	dht11_module dht11_inst(
+		.clk(clk),
+		.rst_n(rst_n),
+		.dht11_data(dht11_data),
+		.temp_value(temp_value),
+		.humi_value(humi_value)
+	);
+
+	// MAX30102 module instantiation
+	max30102_module max30102_inst(
+		.clk(clk),
+		.rst_n(rst_n),
+		.sda(max30102_sda),
+		.scl(max30102_scl),
+		.heart_rate(heart_rate),
+		.spo2(spo2)
+	);
+
+endmodule

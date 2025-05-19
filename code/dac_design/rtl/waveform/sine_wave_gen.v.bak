@@ -1,0 +1,37 @@
+// -----------------------------------------------------------------------------
+// 文件名称: square_wave_gen.v
+// 模块功能: 方波发生器
+// 创建日期: 2025-04-02
+// -----------------------------------------------------------------------------
+
+module square_wave_gen (
+    input  wire        clk,          // 系统时钟
+    input  wire        rst_n,        // 低电平有效复位信号
+    
+    // 方波控制和输出
+    input  wire [7:0]  freq_ctrl,    // 频率控制字
+    output reg  [7:0]  wave_data     // 方波数据输出(8位分辨率)
+);
+
+    // 内部寄存器
+    reg [7:0] addr_cnt;              // 地址计数器
+
+    // 方波输出逻辑
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            addr_cnt <= 8'd0;
+        else
+            addr_cnt <= addr_cnt + freq_ctrl; // 频率控制，增加值越大，频率越高
+    end
+    
+    // 输出方波数据
+    // 使用计数器的最高位(addr_cnt[7])来控制输出
+    // 当最高位为0时输出高电平，为1时输出低电平
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            wave_data <= 8'd0;        // 复位到低电平
+        else
+            wave_data <= addr_cnt[7] ? 8'd0 : 8'd255; // 输出0或255
+    end
+
+endmodule 

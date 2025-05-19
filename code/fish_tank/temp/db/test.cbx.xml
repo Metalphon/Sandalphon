@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<LOG_ROOT>
+	<PROJECT NAME="test">
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Div3" CBX_FILE_NAME="lpm_divide_sim.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Mod6" CBX_FILE_NAME="lpm_divide_m9m.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|sld_signaltap:auto_signaltap_0|sld_signaltap_impl:sld_signaltap_body|sld_signaltap_implb:sld_signaltap_body|altsyncram:\stp_non_zero_ram_gen:stp_buffer_ram" CBX_FILE_NAME="altsyncram_cu14.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Div4" CBX_FILE_NAME="lpm_divide_mhm.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Mod7" CBX_FILE_NAME="lpm_divide_m9m.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|sld_signaltap:auto_signaltap_0|sld_signaltap_impl:sld_signaltap_body|sld_signaltap_implb:sld_signaltap_body|altdpram:\stp_non_zero_ram_gen:attribute_mem_gen:attribute_mem|lpm_mux:mux" CBX_FILE_NAME="mux_ssc.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|sld_signaltap:auto_signaltap_0|sld_signaltap_impl:sld_signaltap_body|sld_signaltap_implb:sld_signaltap_body|sld_offload_buffer_mgr:\stp_non_zero_depth_offload_gen:stp_offload_buff_mgr_inst|LPM_COUNTER:\adv_point_3_and_more:advance_pointer_counter" CBX_FILE_NAME="cntr_ggi.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Div5" CBX_FILE_NAME="lpm_divide_jhm.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Mod0" CBX_FILE_NAME="lpm_divide_m9m.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Mod8" CBX_FILE_NAME="lpm_divide_m9m.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Div2" CBX_FILE_NAME="lpm_divide_vim.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Div6" CBX_FILE_NAME="lpm_divide_mhm.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Mod1" CBX_FILE_NAME="lpm_divide_m9m.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Mod10" CBX_FILE_NAME="lpm_divide_m9m.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Mod5" CBX_FILE_NAME="lpm_divide_vam.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Mod9" CBX_FILE_NAME="lpm_divide_m9m.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|sld_signaltap:auto_signaltap_0|sld_signaltap_impl:sld_signaltap_body|sld_signaltap_implb:sld_signaltap_body|sld_offload_buffer_mgr:\stp_non_zero_depth_offload_gen:stp_offload_buff_mgr_inst|LPM_COUNTER:read_pointer_counter" CBX_FILE_NAME="cntr_i6j.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|top_temp:u_top_temp|max30102_Init:u_max30102_Init|I2C_Init_Dev:u_I2C_Init_Dev|max30102_init_table:u_max30102_init_table|altsyncram:Mux10_rtl_0" CBX_FILE_NAME="altsyncram_l0v.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Div7" CBX_FILE_NAME="lpm_divide_jhm.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Mod11" CBX_FILE_NAME="lpm_divide_m9m.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Mod2" CBX_FILE_NAME="lpm_divide_m9m.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|sld_signaltap:auto_signaltap_0|sld_signaltap_impl:sld_signaltap_body|sld_signaltap_implb:sld_signaltap_body|sld_offload_buffer_mgr:\stp_non_zero_depth_offload_gen:stp_offload_buff_mgr_inst|LPM_COUNTER:status_advance_pointer_counter" CBX_FILE_NAME="cntr_egi.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Div0" CBX_FILE_NAME="lpm_divide_mhm.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Mod3" CBX_FILE_NAME="lpm_divide_vam.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Div1" CBX_FILE_NAME="lpm_divide_jhm.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|debug_uart_tx:u_temp_uart_tx|lpm_divide:Mod4" CBX_FILE_NAME="lpm_divide_vam.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|sld_signaltap:auto_signaltap_0|sld_signaltap_impl:sld_signaltap_body|sld_signaltap_implb:sld_signaltap_body|altdpram:\stp_non_zero_ram_gen:attribute_mem_gen:attribute_mem|lpm_decode:wdecoder" CBX_FILE_NAME="decode_dvf.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|test|sld_signaltap:auto_signaltap_0|sld_signaltap_impl:sld_signaltap_body|sld_signaltap_implb:sld_signaltap_body|sld_offload_buffer_mgr:\stp_non_zero_depth_offload_gen:stp_offload_buff_mgr_inst|LPM_COUNTER:status_read_pointer_counter" CBX_FILE_NAME="cntr_23j.tdf"/>
+	</PROJECT>
+</LOG_ROOT>

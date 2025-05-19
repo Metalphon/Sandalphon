@@ -1,0 +1,13 @@
+
+State Machine - |origin|freq_val
+Name freq_val.FREQ_HIGH 
+freq_val.FREQ_LOW 0 
+freq_val.FREQ_HIGH 1 
+
+State Machine - |origin|DAC_I2C:dac_i2c_inst|state
+Name state.WRITE state.START state.MAIN state.IDLE state.STOP 
+state.IDLE 0 0 0 0 0 
+state.MAIN 0 0 1 1 0 
+state.START 0 1 0 1 0 
+state.WRITE 1 0 0 1 0 
+state.STOP 0 0 0 1 1 

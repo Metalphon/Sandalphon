@@ -1,0 +1,26 @@
+-- begin_signature
+-- uart_tx(CLK_FRE
+-- 50
+-- BAUD_RATE
+-- 115200)
+-- end_signature
+WIDTH=8;
+DEPTH=12;
+
+ADDRESS_RADIX=UNS;
+DATA_RADIX=BIN;
+
+CONTENT BEGIN
+	11 :	00001101;
+	10 :	00110001;
+	9 :	00111101;
+	8 :	01011000;
+	7 :	01010101;
+	6 :	01001101;
+	5 :	01010000;
+	4 :	01001001;
+	3 :	01000011;
+	2 :	00101011;
+	1 :	01010100;
+	0 :	01000001;
+END;

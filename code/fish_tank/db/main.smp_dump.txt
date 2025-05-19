@@ -1,0 +1,66 @@
+
+State Machine - |main|debug_uart_tx:u_debug_uart_tx|tx_cnt
+Name tx_cnt.0111 tx_cnt.0110 tx_cnt.0101 tx_cnt.0100 tx_cnt.0011 tx_cnt.0010 tx_cnt.0001 tx_cnt.0000 
+tx_cnt.0000 0 0 0 0 0 0 0 0 
+tx_cnt.0001 0 0 0 0 0 0 1 1 
+tx_cnt.0010 0 0 0 0 0 1 0 1 
+tx_cnt.0011 0 0 0 0 1 0 0 1 
+tx_cnt.0100 0 0 0 1 0 0 0 1 
+tx_cnt.0101 0 0 1 0 0 0 0 1 
+tx_cnt.0110 0 1 0 0 0 0 0 1 
+tx_cnt.0111 1 0 0 0 0 0 0 1 
+
+State Machine - |main|debug_uart_tx:u_debug_uart_tx|uart_tx:u_uart_tx|state
+Name state.S_SEND_BYTE state.S_START state.S_IDLE state.S_STOP 
+state.S_IDLE 0 0 0 0 
+state.S_START 0 1 1 0 
+state.S_SEND_BYTE 1 0 1 0 
+state.S_STOP 0 0 1 1 
+
+State Machine - |main|top_temp:u_top_temp|max30102_Init:u_max30102_Init|I2C_Init_Dev:u_I2C_Init_Dev|state_cnt
+Name state_cnt.0110 state_cnt.0101 state_cnt.0100 state_cnt.0011 state_cnt.0010 state_cnt.0001 state_cnt.0000 
+state_cnt.0000 0 0 0 0 0 0 0 
+state_cnt.0001 0 0 0 0 0 1 1 
+state_cnt.0010 0 0 0 0 1 0 1 
+state_cnt.0011 0 0 0 1 0 0 1 
+state_cnt.0100 0 0 1 0 0 0 1 
+state_cnt.0101 0 1 0 0 0 0 1 
+state_cnt.0110 1 0 0 0 0 0 1 
+
+State Machine - |main|top_temp:u_top_temp|max30102_Init:u_max30102_Init|I2C_Init_Dev:u_I2C_Init_Dev|state
+Name state.00 state.10 state.01 
+state.00 0 0 0 
+state.01 1 0 1 
+state.10 1 1 0 
+
+State Machine - |main|top_temp:u_top_temp|max30102_Init:u_max30102_Init|I2C_Init_Dev:u_I2C_Init_Dev|i2c_control:i2c_control|state
+Name state.LRD_REG_DONE state.WAIT_LRD_DONE state.LRD_REG state.RD_REG_DONE state.WAIT_RD_DONE state.RD_REG state.WR_REG_DONE state.WAIT_WR_DONE state.WR_REG state.IDLE 
+state.IDLE 0 0 0 0 0 0 0 0 0 0 
+state.WR_REG 0 0 0 0 0 0 0 0 1 1 
+state.WAIT_WR_DONE 0 0 0 0 0 0 0 1 0 1 
+state.WR_REG_DONE 0 0 0 0 0 0 1 0 0 1 
+state.RD_REG 0 0 0 0 0 1 0 0 0 1 
+state.WAIT_RD_DONE 0 0 0 0 1 0 0 0 0 1 
+state.RD_REG_DONE 0 0 0 1 0 0 0 0 0 1 
+state.LRD_REG 0 0 1 0 0 0 0 0 0 1 
+state.WAIT_LRD_DONE 0 1 0 0 0 0 0 0 0 1 
+state.LRD_REG_DONE 1 0 0 0 0 0 0 0 0 1 
+
+State Machine - |main|top_temp:u_top_temp|max30102_Init:u_max30102_Init|I2C_Init_Dev:u_I2C_Init_Dev|i2c_control:i2c_control|i2c_bit_shift:i2c_bit_shift|state
+Name state.GEN_STO state.GEN_ACK state.CHECK_ACK state.RD_DATA state.WR_DATA state.GEN_STA state.IDLE 
+state.IDLE 0 0 0 0 0 0 0 
+state.GEN_STA 0 0 0 0 0 1 1 
+state.WR_DATA 0 0 0 0 1 0 1 
+state.RD_DATA 0 0 0 1 0 0 1 
+state.CHECK_ACK 0 0 1 0 0 0 1 
+state.GEN_ACK 0 1 0 0 0 0 1 
+state.GEN_STO 1 0 0 0 0 0 1 
+
+State Machine - |main|dht11_module:dht11_inst|cur_state
+Name cur_state.REV_data cur_state.DELAY_75us cur_state.REPLY cur_state.DELAY_10us cur_state.START cur_state.WAIT_1S 
+cur_state.WAIT_1S 0 0 0 0 0 0 
+cur_state.START 0 0 0 0 1 1 
+cur_state.DELAY_10us 0 0 0 1 0 1 
+cur_state.REPLY 0 0 1 0 0 1 
+cur_state.DELAY_75us 0 1 0 0 0 1 
+cur_state.REV_data 1 0 0 0 0 1 

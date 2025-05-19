@@ -1,0 +1,46 @@
+module mq2_module(
+    input clk,              // System clock input
+    input rst_n,           // Reset signal input, active low
+    input mq2_data,        // MQ-2 sensor digital input (low: gas detected, high: normal)
+    output reg buzzer      // Alert signal output (high: alert, low: normal)
+);
+
+    // Debounce counter to filter noise
+    reg [7:0] debounce_cnt;
+    parameter DEBOUNCE_TIME = 8'd20;  // 20 clock cycles for debounce
+    
+    // State registers
+    reg mq2_state;
+    reg mq2_state_prev;
+
+    // Debounce and alarm logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            debounce_cnt <= 8'd0;
+            mq2_state <= 1'b0;
+            mq2_state_prev <= 1'b0;
+            buzzer <= 1'b0;    // Initialize to no alert
+        end
+        else begin
+            mq2_state_prev <= mq2_state;
+            
+            // Debounce input signal
+            if (mq2_data != mq2_state) begin
+                if (debounce_cnt >= DEBOUNCE_TIME) begin
+                    mq2_state <= mq2_data;
+                    debounce_cnt <= 8'd0;
+                end
+                else begin
+                    debounce_cnt <= debounce_cnt + 1'b1;
+                end
+            end
+            else begin
+                debounce_cnt <= 8'd0;
+            end
+            
+            // Update alert output - active high
+            buzzer <= ~mq2_data;  // Low input means gas detected, so invert for alert signal
+        end
+    end
+
+endmodule

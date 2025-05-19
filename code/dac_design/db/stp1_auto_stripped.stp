@@ -1,0 +1,406 @@
+<session jtag_chain="USB-Blaster [USB-0]" jtag_device="@1: EP3C(10|5)/EP4CE(10|6) (0x020F10DD)" sof_file="../output_files/origin.sof">
+  <display_tree gui_logging_enabled="0">
+    <display_branch instance="auto_signaltap_0" log="USE_GLOBAL_TEMP" signal_set="USE_GLOBAL_TEMP" trigger="USE_GLOBAL_TEMP"/>
+  </display_tree>
+  <instance entity_name="sld_signaltap" is_auto_node="yes" is_expanded="true" name="auto_signaltap_0" source_file="sld_signaltap.vhd">
+    <node_ip_info instance_id="0" mfg_id="110" node_id="0" version="6"/>
+    <signal_set global_temp="1" is_expanded="true" name="signal_set: 2025/04/08 17:57:10  #0">
+      <clock name="clk" polarity="posedge" tap_mode="probeonly"/>
+      <config ram_type="AUTO" reserved_data_nodes="0" reserved_storage_qualifier_nodes="0" reserved_trigger_nodes="0" sample_depth="128" trigger_in_enable="no" trigger_out_enable="no"/>
+      <top_entity/>
+      <signal_vec>
+        <trigger_input_vec>
+          <wire name="scl" tap_mode="classic"/>
+          <wire name="sda" tap_mode="classic"/>
+          <wire name="sel1" tap_mode="classic"/>
+          <wire name="sel2" tap_mode="classic"/>
+        </trigger_input_vec>
+        <data_input_vec>
+          <wire name="scl" tap_mode="classic"/>
+          <wire name="sda" tap_mode="classic"/>
+          <wire name="sel1" tap_mode="classic"/>
+          <wire name="sel2" tap_mode="classic"/>
+          <wire name="wave_data[0]" tap_mode="classic"/>
+          <wire name="wave_data[1]" tap_mode="classic"/>
+          <wire name="wave_data[2]" tap_mode="classic"/>
+          <wire name="wave_data[3]" tap_mode="classic"/>
+          <wire name="wave_data[4]" tap_mode="classic"/>
+          <wire name="wave_data[5]" tap_mode="classic"/>
+          <wire name="wave_data[6]" tap_mode="classic"/>
+          <wire name="wave_data[7]" tap_mode="classic"/>
+        </data_input_vec>
+        <storage_qualifier_input_vec>
+          <wire name="scl" tap_mode="classic"/>
+          <wire name="sda" tap_mode="classic"/>
+          <wire name="sel1" tap_mode="classic"/>
+          <wire name="sel2" tap_mode="classic"/>
+          <wire name="wave_data[0]" tap_mode="classic"/>
+          <wire name="wave_data[1]" tap_mode="classic"/>
+          <wire name="wave_data[2]" tap_mode="classic"/>
+          <wire name="wave_data[3]" tap_mode="classic"/>
+          <wire name="wave_data[4]" tap_mode="classic"/>
+          <wire name="wave_data[5]" tap_mode="classic"/>
+          <wire name="wave_data[6]" tap_mode="classic"/>
+          <wire name="wave_data[7]" tap_mode="classic"/>
+        </storage_qualifier_input_vec>
+      </signal_vec>
+      <presentation>
+        <unified_setup_data_view>
+          <node name="wave_data" order="msb_to_lsb" type="combinatorial">
+            <node data_index="11" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[7]" storage_index="11" tap_mode="classic" type="unknown"/>
+            <node data_index="10" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[6]" storage_index="10" tap_mode="classic" type="unknown"/>
+            <node data_index="9" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[5]" storage_index="9" tap_mode="classic" type="unknown"/>
+            <node data_index="8" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[4]" storage_index="8" tap_mode="classic" type="unknown"/>
+            <node data_index="7" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[3]" storage_index="7" tap_mode="classic" type="unknown"/>
+            <node data_index="6" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[2]" storage_index="6" tap_mode="classic" type="unknown"/>
+            <node data_index="5" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[1]" storage_index="5" tap_mode="classic" type="unknown"/>
+            <node data_index="4" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[0]" storage_index="4" tap_mode="classic" type="unknown"/>
+          </node>
+          <node data_index="2" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" name="sel1" storage_index="2" tap_mode="classic" trigger_index="2" type="unknown"/>
+          <node data_index="3" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" name="sel2" storage_index="3" tap_mode="classic" trigger_index="3" type="unknown"/>
+          <node data_index="0" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" name="scl" storage_index="0" tap_mode="classic" trigger_index="0" type="unknown"/>
+          <node data_index="1" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" name="sda" storage_index="1" tap_mode="classic" trigger_index="1" type="unknown"/>
+        </unified_setup_data_view>
+        <data_view>
+          <bus name="wave_data" order="msb_to_lsb" type="combinatorial">
+            <net data_index="11" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[7]" storage_index="11" tap_mode="classic" type="unknown"/>
+            <net data_index="10" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[6]" storage_index="10" tap_mode="classic" type="unknown"/>
+            <net data_index="9" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[5]" storage_index="9" tap_mode="classic" type="unknown"/>
+            <net data_index="8" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[4]" storage_index="8" tap_mode="classic" type="unknown"/>
+            <net data_index="7" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[3]" storage_index="7" tap_mode="classic" type="unknown"/>
+            <net data_index="6" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[2]" storage_index="6" tap_mode="classic" type="unknown"/>
+            <net data_index="5" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[1]" storage_index="5" tap_mode="classic" type="unknown"/>
+            <net data_index="4" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[0]" storage_index="4" tap_mode="classic" type="unknown"/>
+          </bus>
+          <net data_index="2" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" name="sel1" storage_index="2" tap_mode="classic" trigger_index="2" type="unknown"/>
+          <net data_index="3" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" name="sel2" storage_index="3" tap_mode="classic" trigger_index="3" type="unknown"/>
+          <net data_index="0" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" name="scl" storage_index="0" tap_mode="classic" trigger_index="0" type="unknown"/>
+          <net data_index="1" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" name="sda" storage_index="1" tap_mode="classic" trigger_index="1" type="unknown"/>
+        </data_view>
+        <setup_view>
+          <bus name="wave_data" order="msb_to_lsb" type="combinatorial">
+            <net data_index="11" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[7]" storage_index="11" tap_mode="classic" type="unknown"/>
+            <net data_index="10" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[6]" storage_index="10" tap_mode="classic" type="unknown"/>
+            <net data_index="9" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[5]" storage_index="9" tap_mode="classic" type="unknown"/>
+            <net data_index="8" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[4]" storage_index="8" tap_mode="classic" type="unknown"/>
+            <net data_index="7" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[3]" storage_index="7" tap_mode="classic" type="unknown"/>
+            <net data_index="6" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[2]" storage_index="6" tap_mode="classic" type="unknown"/>
+            <net data_index="5" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[1]" storage_index="5" tap_mode="classic" type="unknown"/>
+            <net data_index="4" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="wave_data[0]" storage_index="4" tap_mode="classic" type="unknown"/>
+          </bus>
+          <net data_index="2" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" name="sel1" storage_index="2" tap_mode="classic" trigger_index="2" type="unknown"/>
+          <net data_index="3" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" name="sel2" storage_index="3" tap_mode="classic" trigger_index="3" type="unknown"/>
+          <net data_index="0" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" name="scl" storage_index="0" tap_mode="classic" trigger_index="0" type="unknown"/>
+          <net data_index="1" duplicate_name_allowed="false" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" name="sda" storage_index="1" tap_mode="classic" trigger_index="1" type="unknown"/>
+        </setup_view>
+        <trigger_in_editor/>
+        <trigger_out_editor/>
+      </presentation>
+      <trigger CRC="1607A86D" attribute_mem_mode="false" gap_record="true" global_temp="1" is_expanded="true" name="trigger: 2025/04/08 17:57:10  #1" position="pre" power_up_trigger_mode="false" record_data_gap="true" segment_size="1" storage_mode="off" storage_qualifier_disabled="no" storage_qualifier_port_is_pin="true" storage_qualifier_port_name="auto_stp_external_storage_qualifier" storage_qualifier_port_tap_mode="classic" trigger_type="circular">
+        <power_up_trigger position="pre" storage_qualifier_disabled="no"/>
+        <events use_custom_flow_control="no">
+          <level enabled="yes" name="condition1" type="basic">
+            <power_up enabled="yes">
+            </power_up>
+            <op_node/>
+          </level>
+        </events>
+        <storage_qualifier_events>
+          <transitional>111100000000
+            <pwr_up_transitional>111100000000</pwr_up_transitional>
+          </transitional>
+          <storage_qualifier_level type="basic">
+            <power_up>
+            </power_up>
+            <op_node/>
+          </storage_qualifier_level>
+          <storage_qualifier_level type="basic">
+            <power_up>
+            </power_up>
+            <op_node/>
+          </storage_qualifier_level>
+          <storage_qualifier_level type="basic">
+            <power_up>
+            </power_up>
+            <op_node/>
+          </storage_qualifier_level>
+        </storage_qualifier_events>
+      </trigger>
+    </signal_set>
+    <position_info>
+      <single attribute="active tab" value="0"/>
+    </position_info>
+  </instance>
+  <mnemonics/>
+  <embedded_sof_files>
+    <embedded_sof_file id_crc_pairs="" name="origin.sof" size="358646">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
+EurBW5Nm/ecimG4NhvMKYpFGfU2DLSgvgskTfxvgtSjamh5M6o7vDbxoHWIg
+ljbkTQqizi0LndnP9sgb9YiHd61lLWeDyHq2izP5uPNaHcsuGZPLeDUd+3Vj
+1LkLI32wImlcT+T4mtdYUtcf9+KaHoZ9scEIjt8zgPE3lyLx1/ZZ9b7AI/v6
+mycBPvfBIVxLul/Tf70EodjX0ytnYENeofx7WwBf+OXODy800t7BYPYRfqnT
+VFCR81EeAdhxn7kQGG2fyxUdpoHLRXk8vyvZD4eryXe2u5PS4a2WbHgr2ZLp
+o1eH8HMDiO+/z4t90cK++Kzg9PsvjeDA4zAc/96py+KteLd9RbU1F2/twL42
+ZgUn70pCve+hIayfgcF0tGTT+5prGmxBeRFEor+R9L6GiX1Nv57I/7OAel/p
+JzX/QEedt+YtWeQv5CNpX6MBWN4n2qvPZEsufolPoWIX71m7avuLeel0BIMk
++/jIz8LkZRzNzmDzB59dioG/g23BV5KW/PVLNt8O05YwBKH3xb/zKwArn4/h
+6htDEP88nN7XejSC3/giwGOfhlPb25JL43JtTYMtKC+CwOIS2rkvcZhEZwbT
+r3GOpdkhi49HyFlNbAQIn5hnlh5lw7rGPlxuIPYWzFvNCMe+5AOsoRtKzUJ+
+VWFH+sTUMGW0/AoszXbsy0Vv34szCESvcNE08Ky5ERLCZ00L+xoBvn2pNQv5
+VYZNiyD0vsqj5VaIVntfcUBXB/JQzUMQRCPC631lT9qwr74O3SCIPhDOXaQI
+R4RoX9rE9HhpX8I0Us/gXSdA1Kd6v9XB1bfz316xjqZpcOjNdKrfquX6siJG
+fgWWZjG/yrCSqVxbPt9Uy1g1MTW/AkvTYD4sBhxJx7UmKqLj+BbtjSngtzfU
+moX8KsMyk0C9g/rMPYTLRUP7Ap2PNLAvpWYxP6V96UsoUVY6ixVYmoX8KsMS
+RCnTrhMIBNZ1Ai4QHt5pBQO+vST72gnZF0EQThi3Gs3kXF5v4XLR0L4iB/al
+1Czm58q+tpTRoJF9qTUL+VWGJfYWLhrNQTbEPcH4omrHmjURfmry7WVQvS9m
+kJgWM/ta6VXvC+sSmmvNurhwd2oxuEX+QPv++WO5WIeTHaZjADctyHb823eE
+XHxL1k0/MnvlhzDa4u+w1rQmtrav8V+JgF2+c5DVwl/8OMBv3Nb3k4cyyrX7
+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
+
+    
+    
+    </embedded_sof_file>
+  </embedded_sof_files>
+  <static_plugin_mnemonics/>
+  <global_info>
+    <single attribute="active instance" value="0"/>
+    <single attribute="config widget visible" value="1"/>
+    <single attribute="data log widget visible" value="1"/>
+    <single attribute="hierarchy widget visible" value="1"/>
+    <single attribute="instance widget visible" value="1"/>
+    <single attribute="jtag widget visible" value="1"/>
+    <multi attribute="frame size" size="2" value="1578,1055"/>
+    <multi attribute="jtag widget size" size="2" value="370,139"/>
+  </global_info>
+</session>

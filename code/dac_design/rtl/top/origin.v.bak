@@ -1,0 +1,46 @@
+// -----------------------------------------------------------------------------
+// 文件名称: origin.v
+// 模块功能: 顶层模块，生成方波并通过I2C输出至DAC
+// 创建日期: 2025-04-02
+// -----------------------------------------------------------------------------
+
+module origin (
+    input  wire       clk,          // 系统时钟输入，50MHz
+    input  wire       rst_n,        // 低电平有效复位信号
+    
+    // I2C接口
+    output wire       scl,          // I2C时钟线
+    inout  wire       sda           // I2C数据线
+);
+
+    // 参数定义
+    parameter CLK_FREQ      = 50_000_000;  // 系统时钟频率: 50MHz
+    parameter WAVE_FREQ_VAL = 8'd20;       // 方波频率控制值，值越大频率越高
+    
+    // 波形数据信号
+    wire [7:0]  wave_data;               // 方波数据（8位分辨率）
+    
+    // DAC控制信号
+    wire        dac_done;                // DAC处理完成标志
+    
+    // 方波发生器模块实例化
+    square_wave_gen u_wave_gen (
+        .clk(clk),
+        .rst_n(rst_n),
+        .freq_ctrl(WAVE_FREQ_VAL),       // 使用固定频率值
+        .wave_data(wave_data)            // 输出方波数据
+    );
+    
+    // DAC I2C控制模块实例化
+    DAC_I2C #(
+        .CNT_NUM(125)                    // 设置I2C时钟分频系数，50MHz/(125*2)=200kHz
+    ) u_DAC_I2C (
+        .clk_in(clk),
+        .rst_n_in(rst_n),
+        .dac_done(dac_done),
+        .dac_data(wave_data),            // 输入方波数据
+        .scl_out(scl),
+        .sda_out(sda)
+    );
+    
+endmodule 

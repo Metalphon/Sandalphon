@@ -1,0 +1,41 @@
+standard
+***Report Model: main***
+
+IO Statistics
+#IO                        15
+  #input                    2
+  #output                  11
+  #inout                    2
+
+LUT Statistics
+#Total_luts              3372
+  #lut4                   867
+  #lut5                   325
+  #lut6                     0
+  #lut5_mx41                0
+  #lut4_alu1b            2180
+
+Utilization Statistics
+#lut                     3372   out of  19600   17.20%
+#reg                      181   out of  19600    0.92%
+#le                         0
+#dsp                        4   out of     29   13.79%
+#bram                       0   out of     64    0.00%
+  #bram9k                   0
+  #fifo9k                   0
+#bram32k                    0   out of     16    0.00%
+#pad                       15   out of    188    7.98%
+  #ireg                     0
+  #oreg                     0
+  #treg                     0
+#pll                        0   out of      4    0.00%
+
+Report Hierarchy Area:
++-----------------------------------------------------------------------------+
+|Instance            |Module          |lut    |ripple |seq    |bram   |dsp    |
++-----------------------------------------------------------------------------+
+|top                 |main            |1192   |2180   |181    |0      |4      |
+|  u_adc_i2c         |ADC_I2C         |145    |52     |56     |0      |0      |
+|  u_lcd1602_display |lcd_1602        |222    |374    |73     |0      |0      |
+|  u_voltage_convert |voltage_convert |825    |1754   |52     |0      |4      |
++-----------------------------------------------------------------------------+

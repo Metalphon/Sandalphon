@@ -1,0 +1,4 @@
+Info (10281): Verilog HDL Declaration information at uart_tx.v(32): object "AT_CIPMUX" differs only in case from object "at_cipmux" in the same scope
+Info (10281): Verilog HDL Declaration information at uart_tx.v(33): object "AT_CIPSERVER" differs only in case from object "at_cipserver" in the same scope
+Info (10281): Verilog HDL Declaration information at uart_tx.v(34): object "AT_CIPSEND" differs only in case from object "at_cipsend" in the same scope
+Info (10281): Verilog HDL Declaration information at i2c_control.v(35): object "ack" differs only in case from object "ACK" in the same scope
