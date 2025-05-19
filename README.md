@@ -1,1 +1,1 @@
-# fuck those who steal my shit
+# 标准编程库，可以直接调用，测试过可以使用
